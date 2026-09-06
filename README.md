@@ -1,12 +1,26 @@
-# Lumi — Multilingual On-Screen Guidance AI for Android
-
 <div align="center">
+  <img src="docs/assets/lumi_banner.jpg" alt="LUMI Banner" width="100%">
+  
+  <h2>Lumi Assistant 🎙️</h2>
+  
+  <p>
+    <a href="https://github.com/h55n/lumi">Lumi Android</a> | <a href="#">Lumi Desktop (Coming Soon)</a>
+  </p>
+  
+  <p>
+    <a href="#"><img src="https://img.shields.io/badge/DOCS-LUMI.GITHUB.IO-gold?style=flat-square" alt="Docs"></a>
+    <a href="#"><img src="https://img.shields.io/badge/DISCORD-JOIN_US-5865F2?style=flat-square" alt="Discord"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/LICENSE-MIT-3C873A?style=flat-square" alt="License"></a>
+    <a href="https://github.com/h55n"><img src="https://img.shields.io/badge/BUILT_BY-HTML_TEAM-A855F7?style=flat-square" alt="Built By"></a>
+  </p>
+  <p>
+    <img src="https://img.shields.io/badge/LANG-हिंदी-EF4444?style=flat-square" alt="Hindi">
+    <img src="https://img.shields.io/badge/LANG-தமிழ்-22C55E?style=flat-square" alt="Tamil">
+    <img src="https://img.shields.io/badge/LANG-తెలుగు-F97316?style=flat-square" alt="Telugu">
+  </p>
+
   <p><strong>Bridging the digital divide for the next billion users.</strong></p>
 </div>
-
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-purple)](https://kotlinlang.org)
-[![Android](https://img.shields.io/badge/Android-10%2B-green)](https://developer.android.com)
-[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 ---
 
