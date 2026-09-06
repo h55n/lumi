@@ -14,6 +14,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -76,7 +77,7 @@ class OnboardingActivity : ComponentActivity() {
 
                 Surface(modifier = Modifier.fillMaxSize(), color = LumiCream) {
                     AnimatedContent(targetState = state.screen, transitionSpec = {
-                        slideInHorizontally { it } + fadeIn() togetherWith slideOutHorizontally { -it } + fadeOut()
+                        fadeIn(animationSpec = tween(220)) togetherWith fadeOut(animationSpec = tween(140))
                     }, label = "onboarding") { screen ->
                         when (screen) {
                             OnboardingScreen.WELCOME -> WelcomeScreen(onNext = viewModel::advance)
@@ -198,6 +199,8 @@ fun OverlayPermissionScreen(isGranted: Boolean, onGrant: () -> Unit, onNext: () 
         Spacer(Modifier.weight(1f))
         if (!isGranted) {
             LumiButton("Grant Permission", onClick = onGrant)
+            Spacer(Modifier.height(10.dp))
+            LumiOutlineButton("Not now", onClick = onNext)
         } else {
             LumiButton("Continue →", onClick = onNext)
         }
@@ -222,6 +225,8 @@ fun AccessibilityPermissionScreen(isGranted: Boolean, onGrant: () -> Unit, onNex
         Spacer(Modifier.weight(1f))
         if (!isGranted) {
             LumiButton("Open Accessibility Settings", onClick = onGrant)
+            Spacer(Modifier.height(10.dp))
+            LumiOutlineButton("Not now", onClick = onNext)
         } else {
             LumiButton("Continue →", onClick = onNext)
         }
@@ -253,6 +258,8 @@ fun ScreenCapturePermissionScreen(isGranted: Boolean, onGrant: () -> Unit, onNex
         Spacer(Modifier.weight(1f))
         if (!isGranted) {
             LumiButton("Allow Screen Reading", onClick = onGrant)
+            Spacer(Modifier.height(10.dp))
+            LumiOutlineButton("Not now", onClick = onNext)
         } else {
             LumiButton("Continue →", onClick = onNext)
         }
@@ -308,8 +315,11 @@ fun MicrophonePermissionScreen(isGranted: Boolean, onGranted: () -> Unit, onNext
         Spacer(Modifier.height(24.dp))
         PermissionRow("Microphone", isGranted)
         Spacer(Modifier.weight(1f))
-        if (!isGranted) LumiButton("Allow Microphone", onClick = { launcher.launch(android.Manifest.permission.RECORD_AUDIO) })
-        else LumiButton("Continue →", onClick = onNext)
+        if (!isGranted) {
+            LumiButton("Allow Microphone", onClick = { launcher.launch(android.Manifest.permission.RECORD_AUDIO) })
+            Spacer(Modifier.height(10.dp))
+            LumiOutlineButton("Not now", onClick = onNext)
+        } else LumiButton("Continue →", onClick = onNext)
         Spacer(Modifier.height(24.dp))
     }
 }

@@ -1,4 +1,0 @@
---------- beginning of main
-09-06 07:06:12.912 22311 27873 I NearbyDiscovery: (REDACTED) BloomFilterAdvManager: Detected bloom filter but too far away, ignoring. %sm, %s
-09-06 07:06:15.229 22311 27873 I NearbyDiscovery: (REDACTED) BloomFilterAdvManager: Detected bloom filter but too far away, ignoring. %sm, %s
-09-06 07:06:18.561 22311 27873 I NearbyDiscovery: (REDACTED) BloomFilterAdvManager: Detected bloom filter but too far away, ignoring. %sm, %s

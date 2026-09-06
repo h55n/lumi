@@ -74,9 +74,9 @@ class MainActivity : ComponentActivity() {
                         finish()
                     }
                     StartupEvent.Ready -> {
-                        // Start overlay service, ensure screen capture, and go to minimal home screen
+                        // Screen capture is requested only when a feature actually needs it.
+                        // Requesting it at every launch repeatedly interrupts the user.
                         OverlayService.start(this@MainActivity)
-                        requestScreenCaptureConsent()
                         showHomeScreen()
                     }
                     StartupEvent.AccessibilityServiceDown -> {
@@ -145,4 +145,3 @@ class MainActivity : ComponentActivity() {
         ai.lumi.overlay.OriginOSCompat.ensureOverlayServiceAlive(this)
     }
 }
-

@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/assets/lumi_banner.jpg" alt="LUMI Banner" width="100%">
+  <img src="docs/assets/lumi_banner.jpg" alt="LUMI Banner" width="600">
   
   <h2>Lumi Assistant 🎙️</h2>
   

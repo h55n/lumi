@@ -99,13 +99,15 @@ class OnboardingViewModel @Inject constructor(
         val current = _state.value
         val canAdvance = when (current.screen) {
             OnboardingScreen.WELCOME -> true
-            OnboardingScreen.OVERLAY_PERMISSION -> current.overlayGranted
-            OnboardingScreen.ACCESSIBILITY_PERMISSION -> current.accessibilityGranted
-            OnboardingScreen.SCREEN_CAPTURE_PERMISSION -> current.screenCaptureGranted
+            // Every permission is optional. The app asks once during onboarding;
+            // users may continue and enable a missing capability later from Settings.
+            OnboardingScreen.OVERLAY_PERMISSION -> true
+            OnboardingScreen.ACCESSIBILITY_PERMISSION -> true
+            OnboardingScreen.SCREEN_CAPTURE_PERMISSION -> true
             // Battery exemption: always allow advance on OriginOS/iQOO since the API
             // returns false even when the user has correctly configured background power.
             OnboardingScreen.BATTERY_EXEMPTION -> true
-            OnboardingScreen.MICROPHONE_PERMISSION -> current.microphoneGranted
+            OnboardingScreen.MICROPHONE_PERMISSION -> true
             OnboardingScreen.LANGUAGE_SELECTION -> current.selectedLanguages.isNotEmpty()
             OnboardingScreen.MODEL_DOWNLOAD -> true
             OnboardingScreen.VOICE_VERIFICATION -> true
@@ -288,6 +290,7 @@ class OnboardingViewModel @Inject constructor(
     private fun completeOnboarding() {
         viewModelScope.launch {
             preferences.setOnboardingComplete(true)
+            preferences.setPermissionsCompletedOnce()
             _state.value = _state.value.copy(isComplete = true)
         }
     }

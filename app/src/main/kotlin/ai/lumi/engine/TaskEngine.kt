@@ -175,6 +175,9 @@ class TaskEngine @Inject constructor(
     private var typingJob: Job? = null
     private var transitionJob: Job? = null
     private var pendingDemoContact: String? = null
+    private var guidanceRepeatJob: Job? = null
+    private var lastGuidanceKey: String? = null
+    private var repeatedGuidanceKey: String? = null
 
     fun onScreenChanged(newPackageName: String?) {
         if (newPackageName == "ai.lumi") return // Ignore our own UI
@@ -206,6 +209,10 @@ class TaskEngine @Inject constructor(
     }
 
     private fun scheduleScreenRefresh(source: String) {
+        // Content-change events are noisy (a single list rendering can produce dozens).
+        // Once a refresh is queued or evaluating, let it finish instead of perpetually
+        // cancelling it. A genuine window change always supersedes the in-flight work.
+        if (source == "content" && transitionJob?.isActive == true) return
         // A new live tree supersedes any pending/in-flight cloud analysis. Cancelling
         // it is essential: otherwise a slow response puts a first-screen cursor
         // back after the user has already reached screen two.
@@ -298,6 +305,9 @@ class TaskEngine @Inject constructor(
     fun cancel() {
         activeJob?.cancel()
         transitionJob?.cancel()
+        guidanceRepeatJob?.cancel()
+        lastGuidanceKey = null
+        repeatedGuidanceKey = null
         guidanceVersion++
         ttsEngine.stop()
         context.sendBroadcast(Intent("ai.lumi.HIDE_CURSOR").apply { setPackage(context.packageName) })
@@ -323,9 +333,8 @@ class TaskEngine @Inject constructor(
     }
 
     private suspend fun onTranscriptReceived(text: String, language: String) {
-        // This build is Hindi-first for the live demo. It also covers the
-        // AudioRecord fallback, whose recognizer may report English for Hinglish.
-        val interactionLanguage = "hi"
+        // English is the default; keep Hindi only for a Hindi/Devanagari request.
+        val interactionLanguage = normalizeLanguage(language)
 
         // Demo-critical contact route: "mujhe Hassan ka contact chahiye" opens
         // Contacts directly and finds Hassan from the live tree. It deliberately
@@ -369,6 +378,9 @@ class TaskEngine @Inject constructor(
         currentGoal = text
         currentLanguage = interactionLanguage
         guidanceVersion++
+        guidanceRepeatJob?.cancel()
+        lastGuidanceKey = null
+        repeatedGuidanceKey = null
         stepHistory.clear()
 
         Timber.i("Goal: '$text' [$currentLanguage]")
@@ -644,7 +656,7 @@ class TaskEngine @Inject constructor(
             _state.value = TaskState.Guiding(resolvedStep, currentStepIndex, currentPlan.size)
             val instruction = resolvedStep.instruction(currentLanguage)
             stepHistory.add(instruction)
-            ttsEngine.speak(instruction, currentLanguage)
+            speakGuidanceOnce(instruction, resolvedStep)
             return
         }
 
@@ -719,7 +731,7 @@ class TaskEngine @Inject constructor(
         // Speak instruction
         val instruction = resolvedStep.instruction(currentLanguage)
         stepHistory.add(instruction)
-        ttsEngine.speak(instruction, currentLanguage)
+        speakGuidanceOnce(instruction, resolvedStep)
 
         // Auto-tap logic
         // Lumi is guidance-only. Keep interaction user-initiated, particularly on
@@ -905,6 +917,26 @@ class TaskEngine @Inject constructor(
     }
 
     private fun normalizeLanguage(language: String): String = language.substringBefore('-').lowercase()
+
+    private fun guidanceKey(step: TaskStep): String =
+        "${step.targetDescription}|${step.resolvedBounds}|${step.relativeX}|${step.relativeY}"
+
+    private suspend fun speakGuidanceOnce(instruction: String, step: TaskStep) {
+        val key = guidanceKey(step)
+        if (key == lastGuidanceKey) return
+        lastGuidanceKey = key
+        repeatedGuidanceKey = null
+        guidanceRepeatJob?.cancel()
+        ttsEngine.speak(instruction, currentLanguage)
+        guidanceRepeatJob = engineScope.launch {
+            delay(7000)
+            val state = _state.value
+            if (state is TaskState.Guiding && guidanceKey(state.currentStep) == key && repeatedGuidanceKey != key) {
+                repeatedGuidanceKey = key
+                ttsEngine.speak(if (currentLanguage == "hi") "ज़रूरत हो तो, इसी विकल्प पर टैप करें।" else "When ready, tap the highlighted option.", currentLanguage)
+            }
+        }
+    }
 
     /** Never surface an English model reply inside a Hindi conversation. */
     private fun localizedInstruction(instruction: String, language: String): String {

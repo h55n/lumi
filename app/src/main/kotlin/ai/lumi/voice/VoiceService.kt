@@ -163,11 +163,21 @@ class VoiceService : Service() {
             speechRecognizer = it
         }
 
-        // Hindi-first demo mode: keep recognition and every resulting reply in
-        // Hindi. English remains an additional recognition language for app names.
-        val primaryLangTag = "hi-IN"
+        // English is the default conversation language. Hindi remains an
+        // additional recognizer language and is selected per utterance below.
+        val primaryLangTag = when (activeLanguage) {
+            "hi" -> "hi-IN"
+            "mr" -> "mr-IN"
+            "bn" -> "bn-IN"
+            "ta" -> "ta-IN"
+            "te" -> "te-IN"
+            else -> "en-IN"
+        }
         // Build a comma-separated list of all preferred language tags for the recognizer
-        val allLangTags = activeLanguages.map { lang ->
+        // English is the normal command language, while Hindi remains available on
+        // every recognition request so a Hindi utterance does not need a settings
+        // change before Android can transcribe it correctly.
+        val allLangTags = (activeLanguages + setOf("en", "hi")).map { lang ->
             when (lang) {
                 "hi" -> "hi-IN"
                 "mr" -> "mr-IN"
@@ -180,7 +190,7 @@ class VoiceService : Service() {
                 "kn" -> "kn-IN"
                 else -> "en-IN"
             }
-        }
+        }.distinct()
 
         val recognizerIntent = Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -252,7 +262,8 @@ class VoiceService : Service() {
                 val text = matches?.firstOrNull()?.trim() ?: ""
                 Timber.i("SpeechRecognizer transcription: '$text' (candidates: ${matches?.take(3)})")
                 if (text.isNotBlank()) {
-                    broadcastTranscript(text, "hi")
+                    val language = if (text.any { it in '\u0900'..'\u097F' }) "hi" else activeLanguage
+                    broadcastTranscript(text, language)
                 } else {
                     // Empty result — retry once before AudioRecord
                     if (recognizerRetryCount < 1) {

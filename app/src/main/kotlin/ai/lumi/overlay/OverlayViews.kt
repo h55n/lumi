@@ -122,26 +122,26 @@ class GuidanceBubbleView @JvmOverloads constructor(
 
     init {
         val density = resources.displayMetrics.density
-        val padH = (16 * density).toInt()
-        val padV = (12 * density).toInt()
-        val rad = 16 * density
+        val padH = (18 * density).toInt()
+        val padV = (10 * density).toInt()
+        val rad = 22 * density
 
-        elevation = 12 * density
+        elevation = 6 * density
         setPadding(padH, padV, padH, padV)
 
         // Glassmorphism-style background (Dark Ink with 90% opacity + soft silver stroke)
         background = android.graphics.drawable.GradientDrawable().apply {
             setColor(0xE61A1A2E.toInt()) // 90% opacity
-            setStroke((4f * density).toInt(), 0xFFF5A100.toInt())
+            setStroke((1f * density).toInt(), 0x55F5A100)
             cornerRadius = rad
         }
 
         textView = TextView(context).apply {
             setTextColor(Color.WHITE)
-            textSize = 20f
+            textSize = 18f
             maxLines = 2
-            typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.BOLD)
-            setLineSpacing(4 * density, 1.1f)
+            typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+            setLineSpacing(3 * density, 1.05f)
         }
         addView(textView)
     }
