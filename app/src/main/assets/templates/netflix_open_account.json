@@ -1,0 +1,24 @@
+{
+  "package": "com.netflix.mediaclient",
+  "intent": "open_account",
+  "version_min": 0,
+  "steps": [
+    {
+      "step_id": "tap_profile",
+      "resourceIdHints": ["profile_avatar_view", "profile_avatar", "account_avatar"],
+      "labelHints": ["Profile", "My Netflix", "Account", "Who's watching?"],
+      "expectedClass": "android.view.View",
+      "action": "CLICK",
+      "tts_hi": "Apne profile icon par tap karein",
+      "tts_en": "Tap on your profile icon"
+    },
+    {
+      "step_id": "open_menu",
+      "resourceIdHints": ["menu_button", "settings_button", "overflow_menu"],
+      "labelHints": ["Account", "Settings", "More", "App Settings"],
+      "action": "CLICK",
+      "tts_hi": "Account option par tap karein",
+      "tts_en": "Tap on Account settings"
+    }
+  ]
+}

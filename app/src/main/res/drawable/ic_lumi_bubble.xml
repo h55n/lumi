@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="56dp"
+    android:height="56dp"
+    android:viewportWidth="56"
+    android:viewportHeight="56">
+
+    <!-- Background circle -->
+    <path
+        android:fillColor="#F5A100"
+        android:pathData="M28,4 C14.745,4 4,14.745 4,28 C4,41.255 14.745,52 28,52 C41.255,52 52,41.255 52,28 C52,14.745 41.255,4 28,4 Z"/>
+
+    <!-- Star / sparkle icon in centre -->
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M28,16 L30,24 L38,24 L32,29 L34,37 L28,32 L22,37 L24,29 L18,24 L26,24 Z"/>
+</vector>

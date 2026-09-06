@@ -1,0 +1,122 @@
+{
+  "packageName": "com.phonepe.app",
+  "version": 1,
+  "screens": [
+    {
+      "screenHash": 3241567890123456789,
+      "screenLabel": "PhonePe_Home",
+      "versionCode": 1,
+      "elements": [
+        {"id": "pay_btn", "text": "Pay", "description": "Pay button at bottom navigation", "bounds": [0, 0, 1080, 192]},
+        {"id": "send_money", "text": "Send Money", "description": "Send Money tile", "bounds": [0, 0, 540, 540]},
+        {"id": "scan_qr", "text": "Scan QR", "description": "Scan QR code", "bounds": [540, 0, 1080, 540]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 0,
+          "targetDescription": "Pay button",
+          "instructionEn": "Tap the Pay button at the bottom",
+          "instructionHi": "Yahan tap karo — yeh Pay button hai",
+          "relativeX": 0.5,
+          "relativeY": 0.88,
+          "isLastStep": false
+        }
+      ]
+    },
+    {
+      "screenHash": 3241567890123456780,
+      "screenLabel": "PhonePe_RecipientEntry",
+      "versionCode": 1,
+      "elements": [
+        {"id": "recipient_input", "text": "Mobile number or UPI ID", "description": "Recipient search field", "bounds": [54, 300, 1026, 420]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 1,
+          "targetDescription": "Mobile number or UPI ID",
+          "instructionEn": "Type recipient's number or UPI ID here",
+          "instructionHi": "Yahan recipient ka number ya UPI ID likhein",
+          "relativeX": 0.5,
+          "relativeY": 0.33,
+          "isLastStep": false
+        }
+      ]
+    },
+    {
+      "screenHash": 3241567890123456770,
+      "screenLabel": "PhonePe_RecipientSelected",
+      "versionCode": 1,
+      "elements": [
+        {"id": "proceed_btn", "text": "Proceed", "description": "Proceed button", "bounds": [54, 1700, 1026, 1820]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 2,
+          "targetDescription": "Proceed",
+          "instructionEn": "Tap Proceed to continue",
+          "instructionHi": "Aage badhne ke liye Proceed tap karo",
+          "relativeX": 0.5,
+          "relativeY": 0.83,
+          "isLastStep": false
+        }
+      ]
+    },
+    {
+      "screenHash": 3241567890123456760,
+      "screenLabel": "PhonePe_AmountEntry",
+      "versionCode": 1,
+      "elements": [
+        {"id": "amount_field", "text": "Enter Amount", "description": "Amount input field", "bounds": [54, 400, 1026, 520]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 3,
+          "targetDescription": "Enter Amount",
+          "instructionEn": "Type 500 here — the amount to send",
+          "instructionHi": "Paanch sau — 500 — yahan likhein",
+          "relativeX": 0.5,
+          "relativeY": 0.42,
+          "isLastStep": false
+        }
+      ]
+    },
+    {
+      "screenHash": 3241567890123456750,
+      "screenLabel": "PhonePe_ProceedToPay",
+      "versionCode": 1,
+      "elements": [
+        {"id": "proceed_to_pay", "text": "Proceed to Pay", "description": "Proceed to Pay button", "bounds": [54, 1700, 1026, 1820]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 4,
+          "targetDescription": "Proceed to Pay",
+          "instructionEn": "Tap Proceed to Pay",
+          "instructionHi": "Aur yahan tap karo",
+          "relativeX": 0.5,
+          "relativeY": 0.83,
+          "isLastStep": false
+        }
+      ]
+    },
+    {
+      "screenHash": 3241567890123456740,
+      "screenLabel": "PhonePe_UPIPinEntry",
+      "versionCode": 1,
+      "elements": [
+        {"id": "upi_pin_keypad", "text": "Enter UPI PIN", "description": "UPI PIN numeric keypad", "bounds": [0, 900, 1080, 1920]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 5,
+          "targetDescription": "UPI PIN keypad",
+          "instructionEn": "Enter your UPI PIN — payment will complete",
+          "instructionHi": "Apna UPI PIN daalen — payment ho jayegi",
+          "relativeX": 0.5,
+          "relativeY": 0.6,
+          "isLastStep": true
+        }
+      ]
+    }
+  ]
+}

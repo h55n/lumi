@@ -1,0 +1,39 @@
+{
+  "package": "com.android.contacts",
+  "intent": "make_call",
+  "version_min": 0,
+  "steps": [
+    {
+      "step_id": "search_contacts",
+      "resourceIdHints": ["open_search_bar", "search_action_button", "search_view"],
+      "labelHints": ["Search", "खोजें", "Search contacts"],
+      "action": "CLICK",
+      "tts_hi": "Search par tap karein",
+      "tts_en": "Tap the search bar"
+    },
+    {
+      "step_id": "type_contact_name",
+      "resourceIdHints": ["search_src_text", "search_view"],
+      "labelHints": ["Search contacts", "Type a name"],
+      "action": "TYPE_ENTITY",
+      "tts_hi": "Naam yahan type karein",
+      "tts_en": "Type the name here"
+    },
+    {
+      "step_id": "select_contact_row",
+      "resourceIdHints": ["cliv_name_textview", "contact_tile"],
+      "labelHints": ["Contact"],
+      "action": "CLICK",
+      "tts_hi": "Contact par tap karein",
+      "tts_en": "Tap the contact"
+    },
+    {
+      "step_id": "tap_call_button",
+      "resourceIdHints": ["icon_alternate_action", "call_button", "dial"],
+      "labelHints": ["Call", "कॉल", "Mobile"],
+      "action": "CLICK",
+      "tts_hi": "Call button par tap karein",
+      "tts_en": "Tap the call button"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+# Gradle
+.gradle/
+build/
+**/build/
+gradle-wrapper.jar
+
+# Android
+*.apk
+*.aab
+*.dex
+local.properties
+*.keystore
+*.jks
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+*.swp
+
+# Model files — never committed (too large + contain API keys)
+app/src/main/assets/models/
+app/src/main/jniLibs/**/*.so
+models/
+*.gguf
+*.bin
+*.onnx
+*.ort
+
+# GenieX SDK — not redistributable
+libs/genieX.aar
+libs/whisper-android.aar
+
+# Secrets
+lumi_secure.xml
+local.secrets.properties
+
+# Test outputs
+app/schemas/
+
+# Kotlin
+*.class

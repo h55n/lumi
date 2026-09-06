@@ -1,0 +1,23 @@
+{
+  "package": "com.spotify.music",
+  "intent": "search_music",
+  "version_min": 0,
+  "steps": [
+    {
+      "step_id": "search_tab",
+      "resourceIdHints": ["search_tab", "navigation_bar"],
+      "labelHints": ["Search", "खोजें"],
+      "action": "CLICK",
+      "tts_hi": "Search tab par tap karein",
+      "tts_en": "Tap the Search tab"
+    },
+    {
+      "step_id": "search_input",
+      "resourceIdHints": ["query", "find_search_field"],
+      "labelHints": ["What do you want to play?", "What do you want to listen to?", "Search", "गाना खोजें"],
+      "action": "TYPE_ENTITY",
+      "tts_hi": "Gaane ya artist ka naam likhein",
+      "tts_en": "Type the song or artist name"
+    }
+  ]
+}

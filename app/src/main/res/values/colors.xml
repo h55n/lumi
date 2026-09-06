@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Lumi Design System -->
+    <color name="lumi_saffron">#F5A100</color>
+    <color name="lumi_ink">#1A1A2E</color>
+    <color name="lumi_cream">#FFFAF3</color>
+    <color name="listening_green">#22C55E</color>
+    <color name="success_green">#16A34A</color>
+    <color name="error_red">#DC2626</color>
+    <color name="saffron_light">#FFF3DC</color>
+
+    <!-- System / Material -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

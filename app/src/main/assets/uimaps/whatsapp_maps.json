@@ -1,0 +1,84 @@
+{
+  "packageName": "com.whatsapp",
+  "version": 1,
+  "screens": [
+    {
+      "screenHash": 1234567890123456789,
+      "screenLabel": "WhatsApp_ChatList",
+      "versionCode": 1,
+      "elements": [
+        {"id": "new_chat_fab", "text": "New chat", "description": "New chat floating action button", "bounds": [918, 1680, 1026, 1788]},
+        {"id": "search_btn", "text": "Search", "description": "Search button in toolbar", "bounds": [864, 54, 972, 162]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 0,
+          "targetDescription": "New chat button",
+          "instructionEn": "Tap New Chat to start a message",
+          "instructionHi": "New Chat tap karo message shuru karne ke liye",
+          "relativeX": 0.92,
+          "relativeY": 0.88,
+          "isLastStep": false
+        }
+      ]
+    },
+    {
+      "screenHash": 1234567890123456780,
+      "screenLabel": "WhatsApp_ContactSearch",
+      "versionCode": 1,
+      "elements": [
+        {"id": "search_field", "text": "Search name or number", "description": "Contact search field", "bounds": [54, 130, 1026, 230]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 1,
+          "targetDescription": "Search name or number",
+          "instructionEn": "Type the contact name here",
+          "instructionHi": "Yahan contact ka naam likhein",
+          "relativeX": 0.5,
+          "relativeY": 0.17,
+          "isLastStep": false
+        }
+      ]
+    },
+    {
+      "screenHash": 1234567890123456770,
+      "screenLabel": "WhatsApp_ChatWindow",
+      "versionCode": 1,
+      "elements": [
+        {"id": "message_input", "text": "Message", "description": "Message text input", "bounds": [54, 1760, 918, 1870]},
+        {"id": "send_btn", "text": "Send", "description": "Send message button", "bounds": [918, 1760, 1026, 1870]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 2,
+          "targetDescription": "Message",
+          "instructionEn": "Tap here and type your message",
+          "instructionHi": "Yahan tap karo aur message likhein",
+          "relativeX": 0.5,
+          "relativeY": 0.92,
+          "isLastStep": false
+        }
+      ]
+    },
+    {
+      "screenHash": 1234567890123456760,
+      "screenLabel": "WhatsApp_MessageTyped",
+      "versionCode": 1,
+      "elements": [
+        {"id": "send_btn", "text": "Send", "description": "Send button after typing", "bounds": [918, 1760, 1026, 1870]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 3,
+          "targetDescription": "Send button",
+          "instructionEn": "Tap Send to deliver your message",
+          "instructionHi": "Send tap karo message bhejne ke liye",
+          "relativeX": 0.95,
+          "relativeY": 0.92,
+          "isLastStep": true
+        }
+      ]
+    }
+  ]
+}

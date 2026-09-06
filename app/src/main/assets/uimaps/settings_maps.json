@@ -1,0 +1,64 @@
+{
+  "packageName": "com.android.settings",
+  "version": 1,
+  "screens": [
+    {
+      "screenHash": 7001001001001001001,
+      "screenLabel": "Settings_Main",
+      "versionCode": 1,
+      "elements": [
+        {"id": "wifi_row", "text": "Wi-Fi", "description": "WiFi settings row", "bounds": [0, 270, 1080, 390]},
+        {"id": "network_row", "text": "Network & internet", "description": "Network and internet settings", "bounds": [0, 200, 1080, 340]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 0,
+          "targetDescription": "Wi-Fi",
+          "instructionEn": "Tap Wi-Fi to see network settings",
+          "instructionHi": "Wi-Fi tap karo internet settings ke liye",
+          "relativeX": 0.5,
+          "relativeY": 0.48,
+          "isLastStep": false
+        }
+      ]
+    },
+    {
+      "screenHash": 7001001001001001002,
+      "screenLabel": "Settings_WiFi",
+      "versionCode": 1,
+      "elements": [
+        {"id": "wifi_toggle", "text": "Wi-Fi", "description": "switch_btn", "bounds": [1124, 450, 1301, 623]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 0,
+          "targetDescription": "switch_btn",
+          "instructionEn": "Tap this switch to turn Wi-Fi on or off",
+          "instructionHi": "Wi-Fi chalu ya band karne ke liye is switch par tap karo",
+          "relativeX": 0.84,
+          "relativeY": 0.17,
+          "isLastStep": true
+        }
+      ]
+    },
+    {
+      "screenHash": 7001001001001001003,
+      "screenLabel": "Settings_Display",
+      "versionCode": 1,
+      "elements": [
+        {"id": "dark_mode", "text": "Dark mode", "description": "Dark mode appearance option", "bounds": [800, 600, 1200, 1000]}
+      ],
+      "guidancePlan": [
+        {
+          "stepIndex": 0,
+          "targetDescription": "Dark mode",
+          "instructionEn": "Tap Dark mode to switch to dark theme",
+          "instructionHi": "Dark mode par tap karo dark theme lagane ke liye",
+          "relativeX": 0.68,
+          "relativeY": 0.28,
+          "isLastStep": true
+        }
+      ]
+    }
+  ]
+}

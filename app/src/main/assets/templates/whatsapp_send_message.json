@@ -1,0 +1,47 @@
+{
+  "package": "com.whatsapp",
+  "intent": "send_message",
+  "version_min": 0,
+  "steps": [
+    {
+      "step_id": "tap_search",
+      "resourceIdHints": ["menuitem_search", "search_btn", "fab"],
+      "labelHints": ["Search", "खोजें", "New chat"],
+      "action": "CLICK",
+      "tts_hi": "Search icon par tap karo",
+      "tts_en": "Tap the search icon"
+    },
+    {
+      "step_id": "select_contact",
+      "resourceIdHints": ["search_src_text", "conversations_row_contact_name", "contact_name"],
+      "labelHints": ["Search", "Contact", "Name"],
+      "action": "TYPE_ENTITY",
+      "tts_hi": "Contact ka naam yahan likhein",
+      "tts_en": "Type contact name here"
+    },
+    {
+      "step_id": "open_chat",
+      "resourceIdHints": ["conversations_row_contact_name", "contact_row"],
+      "labelHints": ["Chat"],
+      "action": "CLICK",
+      "tts_hi": "Contact par tap karein",
+      "tts_en": "Tap on the contact"
+    },
+    {
+      "step_id": "enter_message",
+      "resourceIdHints": ["entry", "message_entry"],
+      "labelHints": ["Message", "मैसेज"],
+      "action": "TYPE_ENTITY",
+      "tts_hi": "Apna sandesh yahan type karein",
+      "tts_en": "Type your message here"
+    },
+    {
+      "step_id": "tap_send",
+      "resourceIdHints": ["send", "send_btn"],
+      "labelHints": ["Send", "भेजें"],
+      "action": "CLICK",
+      "tts_hi": "Send button par tap karein",
+      "tts_en": "Tap the send button"
+    }
+  ]
+}

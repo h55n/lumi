@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Touch targets - elderly-safe minimums -->
+    <dimen name="bubble_size_default">56dp</dimen>
+    <dimen name="bubble_size_small">40dp</dimen>
+    <dimen name="bubble_size_large">72dp</dimen>
+    <dimen name="cursor_size">56dp</dimen>
+    <dimen name="min_touch_target">48dp</dimen>
+    <dimen name="language_button_height">64dp</dimen>
+
+    <!-- Typography - accessibility minimums -->
+    <dimen name="text_guidance">20sp</dimen>
+    <dimen name="text_body">18sp</dimen>
+    <dimen name="text_secondary">16sp</dimen>
+
+    <!-- Layout -->
+    <dimen name="screen_padding_h">24dp</dimen>
+    <dimen name="card_radius">20dp</dimen>
+    <dimen name="card_padding">20dp</dimen>
+    <dimen name="button_radius">16dp</dimen>
+
+    <!-- Cursor -->
+    <dimen name="cursor_stroke_width">3dp</dimen>
+    <dimen name="cursor_shadow_radius">8dp</dimen>
+</resources>

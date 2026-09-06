@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="56dp"
+    android:height="56dp"
+    android:viewportWidth="56"
+    android:viewportHeight="56">
+
+    <!-- Voice waveform bars — 5 bars of varying heights -->
+    <path
+        android:fillColor="#F5A100"
+        android:pathData="M8,24 L8,32 Q8,34 10,34 Q12,34 12,32 L12,24 Q12,22 10,22 Q8,22 8,24 Z"/>
+    <path
+        android:fillColor="#F5A100"
+        android:pathData="M16,18 L16,38 Q16,40 18,40 Q20,40 20,38 L20,18 Q20,16 18,16 Q16,16 16,18 Z"/>
+    <path
+        android:fillColor="#F5A100"
+        android:pathData="M24,12 L24,44 Q24,46 26,46 Q28,46 28,44 L28,12 Q28,10 26,10 Q24,10 24,12 Z"/>
+    <path
+        android:fillColor="#F5A100"
+        android:pathData="M32,18 L32,38 Q32,40 34,40 Q36,40 36,38 L36,18 Q36,16 34,16 Q32,16 32,18 Z"/>
+    <path
+        android:fillColor="#F5A100"
+        android:pathData="M40,24 L40,32 Q40,34 42,34 Q44,34 44,32 L44,24 Q44,22 42,22 Q40,22 40,24 Z"/>
+</vector>

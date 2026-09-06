@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lumi</string>
+    <string name="app_tagline">Your phone, explained.</string>
+
+    <!-- Accessibility service -->
+    <string name="accessibility_service_label">Lumi Assistant</string>
+    <string name="accessibility_service_description">Lumi reads your screen to show you exactly where to tap. It does not record, send, or store your screen.</string>
+
+    <!-- Notifications -->
+    <string name="notif_overlay_title">Lumi</string>
+    <string name="notif_overlay_text">Tap the bubble whenever you need help</string>
+    <string name="notif_voice_text">Listening…</string>
+    <string name="notif_capture_text">Reading screen to guide you</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Hi, I\'m Lumi.</string>
+    <string name="onboarding_welcome_subtitle">Your phone, explained.</string>
+    <string name="onboarding_welcome_body">I\'ll show you exactly where to tap — in your language, without internet.</string>
+    <string name="btn_lets_begin">Let\'s begin →</string>
+    <string name="btn_continue">Continue →</string>
+    <string name="btn_grant">Grant Permission</string>
+    <string name="btn_skip">Skip for now</string>
+
+    <!-- Permissions -->
+    <string name="perm_overlay_title">Appear on your screen</string>
+    <string name="perm_overlay_body">So I can show you where to tap, on top of any app.</string>
+    <string name="perm_accessibility_title">Find buttons precisely</string>
+    <string name="perm_accessibility_body">This lets me locate exactly where to point — no guessing.</string>
+    <string name="perm_mic_title">Hear your voice</string>
+    <string name="perm_mic_body">Speak your task — I\'ll understand and guide you.</string>
+
+    <!-- Privacy -->
+    <string name="privacy_promise">Lumi reads your screen to guide you. It does not record, send, or store your screen.</string>
+
+    <!-- Loading audio labels (for accessibility) -->
+    <string name="audio_checking">Let me check your screen…</string>
+    <string name="audio_moment">One moment…</string>
+    <string name="audio_almost">Almost ready…</string>
+    <string name="audio_cancel_hi">Theek hai, ruk jaata hoon.</string>
+    <string name="audio_cancel_en">Okay, I stopped.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_bubble_size">Bubble Size</string>
+    <string name="settings_adaptive_mode">Adaptive Intelligence Mode</string>
+    <string name="settings_memory">What Lumi Remembers</string>
+    <string name="settings_clear_memory">Clear all memories</string>
+
+    <!-- Error states -->
+    <string name="error_screen_secure">I can\'t see this screen to protect your privacy.</string>
+    <string name="error_unexpected_screen">That didn\'t go where I expected. Let me look again.</string>
+    <string name="error_model_not_loaded">AI model not ready. Please wait a moment.</string>
+</resources>

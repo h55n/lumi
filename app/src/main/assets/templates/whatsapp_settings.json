@@ -1,0 +1,23 @@
+{
+  "package": "com.whatsapp",
+  "intent": "open_settings",
+  "version_min": 0,
+  "steps": [
+    {
+      "step_id": "more_options",
+      "resourceIdHints": ["more_options", "menuitem_overflow", "action_bar_overflow"],
+      "labelHints": ["More options", "और विकल्प", "Menu"],
+      "action": "CLICK",
+      "tts_hi": "Teen dot menu par tap karein",
+      "tts_en": "Tap the three dots menu"
+    },
+    {
+      "step_id": "settings_item",
+      "resourceIdHints": ["title"],
+      "labelHints": ["Settings", "सेटिंग्स"],
+      "action": "CLICK",
+      "tts_hi": "Settings par tap karein",
+      "tts_en": "Tap Settings"
+    }
+  ]
+}

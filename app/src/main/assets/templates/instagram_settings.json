@@ -1,0 +1,31 @@
+{
+  "package": "com.instagram.android",
+  "intent": "open_settings",
+  "version_min": 0,
+  "steps": [
+    {
+      "step_id": "tap_profile_tab",
+      "resourceIdHints": ["profile_tab", "tab_avatar", "action_bar_avatar"],
+      "labelHints": ["Profile", "प्रोफ़ाइल"],
+      "action": "CLICK",
+      "tts_hi": "Profile tab par tap karein",
+      "tts_en": "Tap on the profile tab"
+    },
+    {
+      "step_id": "tap_hamburger_menu",
+      "resourceIdHints": ["menu_button", "action_bar_button_action", "overflow_icon"],
+      "labelHints": ["Settings and activity", "Options", "Menu"],
+      "action": "CLICK",
+      "tts_hi": "Menu icon par tap karein",
+      "tts_en": "Tap on the menu icon"
+    },
+    {
+      "step_id": "tap_settings_option",
+      "resourceIdHints": ["row_simple_text_textview", "menu_settings"],
+      "labelHints": ["Settings and privacy", "Settings", "सेटिंग्स"],
+      "action": "CLICK",
+      "tts_hi": "Settings option par tap karein",
+      "tts_en": "Tap on Settings and privacy"
+    }
+  ]
+}

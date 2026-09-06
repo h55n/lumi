@@ -1,0 +1,31 @@
+{
+  "package": "com.android.settings",
+  "intent": "toggle_wifi",
+  "version_min": 0,
+  "steps": [
+    {
+      "step_id": "open_network_settings",
+      "resourceIdHints": ["title", "network_settings", "dashboard_tile"],
+      "labelHints": ["Network & internet", "Connections", "Wi-Fi", "WLAN", "इंटरनेट"],
+      "action": "CLICK",
+      "tts_hi": "Network aur Wi-Fi option par tap karein",
+      "tts_en": "Tap on Network or Wi-Fi"
+    },
+    {
+      "step_id": "open_wifi_section",
+      "resourceIdHints": ["title", "wifi_settings"],
+      "labelHints": ["Wi-Fi", "WLAN", "Internet"],
+      "action": "CLICK",
+      "tts_hi": "Wi-Fi option par tap karein",
+      "tts_en": "Tap on Wi-Fi"
+    },
+    {
+      "step_id": "toggle_wifi_switch",
+      "resourceIdHints": ["switch_widget", "switch_text", "toggle"],
+      "labelHints": ["Use Wi-Fi", "Wi-Fi", "On", "Off", "चालू"],
+      "action": "CLICK",
+      "tts_hi": "Wi-Fi switch par tap karke on karein",
+      "tts_en": "Tap the Wi-Fi switch to turn it on"
+    }
+  ]
+}

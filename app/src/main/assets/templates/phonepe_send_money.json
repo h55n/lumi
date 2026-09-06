@@ -1,0 +1,56 @@
+{
+  "package": "com.phonepe.app",
+  "intent": "send_money",
+  "version_min": 0,
+  "steps": [
+    {
+      "step_id": "tap_pay",
+      "resourceIdHints": ["pay_button", "btn_pay", "home_pay"],
+      "labelHints": ["Pay", "पे", "पेमेंट", "Send", "To Mobile Number", "To Contact"],
+      "expectedClass": "android.widget.Button",
+      "action": "CLICK",
+      "tts_hi": "Yahan tap karo — yeh Pay button hai",
+      "tts_en": "Tap here — this is the Pay button"
+    },
+    {
+      "step_id": "enter_recipient",
+      "resourceIdHints": ["et_mobile", "input_mobile", "phone_number", "search_text"],
+      "labelHints": ["number", "नंबर", "mobile", "recipient", "Enter a mobile number or name"],
+      "expectedClass": "android.widget.EditText",
+      "action": "TYPE_ENTITY",
+      "tts_hi": "Recipient ka number likhein",
+      "tts_en": "Enter the recipient's number"
+    },
+    {
+      "step_id": "tap_proceed",
+      "resourceIdHints": ["btn_proceed", "proceed"],
+      "labelHints": ["Proceed", "आगे", "Next", "Continue"],
+      "action": "CLICK",
+      "tts_hi": "Proceed tap karo",
+      "tts_en": "Tap Proceed"
+    },
+    {
+      "step_id": "enter_amount",
+      "resourceIdHints": ["et_amount", "amount_input", "txt_amount"],
+      "labelHints": ["amount", "राशि", "₹", "Enter amount"],
+      "action": "TYPE_AMOUNT",
+      "tts_hi": "Yahan amount likhein",
+      "tts_en": "Enter amount here"
+    },
+    {
+      "step_id": "tap_proceed_pay",
+      "resourceIdHints": ["btn_proceed_pay", "proceed_to_pay", "btn_pay"],
+      "labelHints": ["Proceed to Pay", "Pay Now", "Pay", "भेजें"],
+      "action": "CLICK",
+      "tts_hi": "Pay tap karo",
+      "tts_en": "Tap Pay to proceed"
+    },
+    {
+      "step_id": "pin_screen",
+      "secure": true,
+      "action": "AUDIO_ONLY",
+      "tts_hi": "Apna UPI PIN daalen",
+      "tts_en": "Enter your UPI PIN"
+    }
+  ]
+}

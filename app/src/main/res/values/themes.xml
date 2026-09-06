@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Lumi" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/lumi_saffron</item>
+        <item name="colorOnPrimary">@color/lumi_ink</item>
+        <item name="colorPrimaryContainer">@color/saffron_light</item>
+        <item name="colorOnPrimaryContainer">@color/lumi_ink</item>
+        <item name="android:colorBackground">@color/lumi_cream</item>
+        <item name="colorOnBackground">@color/lumi_ink</item>
+        <item name="colorSurface">@color/lumi_cream</item>
+        <item name="colorOnSurface">@color/lumi_ink</item>
+        <item name="android:statusBarColor">@color/lumi_cream</item>
+        <item name="android:navigationBarColor">@color/lumi_cream</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <style name="Theme.Lumi.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/lumi_cream</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_lumi_bubble</item>
+        <item name="postSplashScreenTheme">@style/Theme.Lumi</item>
+    </style>
+</resources>

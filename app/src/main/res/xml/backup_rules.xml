@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    No cloud backup — all data stays on device.
+    Room DB encrypted with Android Keystore-backed key.
+    API keys in EncryptedSharedPreferences — never backed up.
+-->
+<full-backup-content>
+    <exclude domain="database" path="lumi.db" />
+    <exclude domain="sharedpref" path="lumi_secure.xml" />
+    <exclude domain="file" path="models/" />
+</full-backup-content>
