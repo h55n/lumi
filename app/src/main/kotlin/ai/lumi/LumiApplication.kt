@@ -17,16 +17,7 @@ class LumiApplication : Application(), Configuration.Provider {
         super.onCreate()
         ai.lumi.cloud.SecureKeyStore.init(this)
 
-        // Pre-load hackathon API keys on first run
-        // These are only written if the slot is currently empty (manual Settings override is preserved)
-        with(ai.lumi.cloud.SecureKeyStore) {
-            if (getGroqKey().isNullOrBlank())
-                setGroqKey("REDACTED_API_KEY")
-            if (getNvidiaKey().isNullOrBlank())
-                setNvidiaKey("REDACTED_API_KEY")
-            if (getMistralKey().isNullOrBlank())
-                setMistralKey("REDACTED_API_KEY")
-        }
+        // API keys are entered by the user in Settings and stored in SecureKeyStore.
 
         if (BuildConfig.DEBUG || BuildConfig.ENABLE_VERBOSE_LOGGING) {
             Timber.plant(Timber.DebugTree())
