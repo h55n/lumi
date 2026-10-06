@@ -13,12 +13,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * vasista22/whisper-hindi-medium-Q4 — fine-tuned Hindi ASR.
- * WER: 8.2% on FLEURS-Hindi benchmark.
+ * Uses the pinned multilingual Whisper Medium Q5_0 artifact for Hindi ASR.
+ * This is not a Hindi-specific fine-tune; no benchmark claim is made.
  *
- * Runtime: whisper.cpp with Vulkan backend (Adreno GPU — all device tiers).
- * This is NOT run via GenieX; whisper.cpp + Vulkan is used directly for
- * the fine-tuned model since GenieX bundles are not available for it.
+ * Runtime: whisper.cpp with Vulkan backend (Adreno GPU). The configured
+ * artifact is multilingual and is not a Hindi-specific fine-tune.
  */
 @Singleton
 class HindiWhisperEngine @Inject constructor(
@@ -30,30 +29,30 @@ class HindiWhisperEngine @Inject constructor(
     private val isNativeAvailable get() = WhisperJNI.loadLibrary()
 
     private val modelFile: File
-        get() = modelDownloadManager.modelFile(ModelSpec.WHISPER_HINDI_MEDIUM_Q4)
+        get() = modelDownloadManager.modelFile(ModelSpec.WHISPER_MEDIUM_Q5_0)
 
     suspend fun warmUp() = withContext(Dispatchers.IO) {
         if (ctxPtr != 0L) return@withContext
         if (!isNativeAvailable) {
-            Timber.w("whisper.cpp JNI not available — using mock for Hindi")
+            Timber.w("whisper.cpp JNI unavailable — local Hindi ASR disabled")
             return@withContext
         }
-        if (!modelFile.exists()) {
-            Timber.w("Hindi Whisper model not downloaded — will use Turbo fallback")
+        if (!modelDownloadManager.isDownloaded(ModelSpec.WHISPER_MEDIUM_Q5_0)) {
+            Timber.w("Hindi Whisper model is missing or failed integrity verification — will use Turbo fallback")
             return@withContext
         }
         ctxPtr = WhisperJNI.initContext(modelFile.absolutePath)
-        Timber.i("Hindi Whisper loaded, ctxPtr=$ctxPtr (WER 8.2% on FLEURS-Hindi)")
+        Timber.i("Hindi Whisper medium loaded, ctxPtr=$ctxPtr")
     }
 
     /**
-     * Transcribe [samples] (16 kHz, mono, float32 PCM) in Hindi.
-     * Falls back to mock if model is not available.
+     * Transcribe [samples] (16 kHz, mono, float32 PCM) with the multilingual model.
+     * Returns an empty result if local ASR is unavailable; the router may use cloud ASR.
      */
     suspend fun transcribe(samples: FloatArray): TranscriptResult = withContext(Dispatchers.IO) {
         if (!isNativeAvailable || ctxPtr == 0L) {
-            Timber.w("Hindi Whisper not ready — mock fallback")
-            return@withContext WhisperJNI.transcribeMock(samples, "hi")
+            Timber.w("Hindi Whisper not ready — returning empty local result")
+            return@withContext WhisperJNI.unavailableTranscript("hi")
         }
         try {
             val json = WhisperJNI.transcribeWithParams(

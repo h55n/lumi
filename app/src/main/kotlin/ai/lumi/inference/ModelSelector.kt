@@ -9,8 +9,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Auto-detects device capabilities and assigns a [DeviceTier].
- * The user NEVER sees a model name, runtime, or configuration option.
+ * Detects device capabilities, assigns a [DeviceTier], and selects compatible models.
+ * Model names and explicit download controls are available in Settings.
  * Called once at first launch; result cached in DataStore via [ai.lumi.data.datastore.LumiPreferences].
  */
 @Singleton
@@ -66,49 +66,34 @@ class ModelSelector @Inject constructor(
     }
 
     /**
-     * Returns the set of models that must be downloaded for [tier] and [languages].
-     * Only includes models where [ModelSpec.isDirectDownloadable] = true.
-     * Non-downloadable models (e.g. Qualcomm QAIRT bundles) use Cloud/Groq mode automatically.
+     * Returns the models required for [tier] and [languages]. Only models with direct URLs,
+     * trusted pinned SHA-256 metadata, and an integrated local runtime are returned.
      */
     fun requiredModels(tier: DeviceTier, languages: Set<String> = emptySet()): List<ModelSpec> = buildList {
-        // Base multilingual/detector Whisper model is required for all active ASR tiers
-        // because WhisperEngine requires it for initial language detection and transcription.
+        // Large Turbo handles flagship/mid-high ASR. Budget devices use the compact Whisper Small artifact.
         when (tier) {
             DeviceTier.FLAGSHIP, DeviceTier.MID_HIGH ->
-                add(ModelSpec.WHISPER_LARGE_V3_TURBO_Q4)
+                add(ModelSpec.WHISPER_LARGE_V3_TURBO_Q5_0)
             DeviceTier.BUDGET ->
-                add(ModelSpec.WHISPER_SMALL_Q4)
+                add(ModelSpec.WHISPER_SMALL_Q5_1)
             DeviceTier.MINIMAL -> { /* no ASR */ }
         }
 
-        // Additional language-specific fine-tuned models
+        // Hindi uses the multilingual medium model; no dedicated fine-tuned artifact is configured.
         if (languages.contains("hi")) {
-            add(ModelSpec.WHISPER_HINDI_MEDIUM_Q4)
+            add(ModelSpec.WHISPER_MEDIUM_Q5_0)
         }
-        // VLM — QWEN3_VL_4B_QAIRT is a Qualcomm SDK model (isDirectDownloadable=false),
-        // so it will be filtered out. Use Moondream2 as the on-device VLM where available.
-        when (tier) {
-            DeviceTier.FLAGSHIP, DeviceTier.MID_HIGH, DeviceTier.BUDGET ->
-                add(ModelSpec.MOONDREAM2_Q4)
-            DeviceTier.MINIMAL -> { /* no VLM */ }
-        }
-        // Memory LLM
-        if (tier == DeviceTier.FLAGSHIP || tier == DeviceTier.MID_HIGH) {
-            add(ModelSpec.QWEN3_1_7B_Q4)
-        }
-        // TTS — Kokoro bundled or System TTS. Nothing to download.
-    }.filter { it.isDirectDownloadable }
+        // GenieX adapters are not integrated yet; do not download models that cannot run locally.
+        // Local VLM and memory inference remain disabled until real adapters are integrated.
+    }.filter { it.isDirectDownloadable && it.hasTrustedSha256 && it.hasRuntimeIntegration }
 }
 
 /**
- * Specification for each downloadable model file.
+ * Specification for each model artifact.
  *
- * All [downloadUrl] values with [isDirectDownloadable]=true are confirmed public
- * direct-download links that do not require authentication tokens.
- *
- * [isDirectDownloadable] = false means the model is obtained via a vendor SDK or
- * sideload path — it is excluded from the download loop; the app falls back to
- * Cloud/Groq mode automatically for those capabilities.
+ * Direct-download entries use public, immutable artifact URLs and trusted SHA-256 metadata.
+ * [hasRuntimeIntegration] is false until this repository can create a real inference session;
+ * those artifacts are not selected, downloaded, or loaded as if they were usable.
  */
 enum class ModelSpec(
     val displayName: String,
@@ -116,64 +101,74 @@ enum class ModelSpec(
     val downloadUrl: String,
     val sha256: String,
     val sizeBytes: Long,
-    /** If false, this model cannot be HTTP-downloaded and will be skipped in the download loop. */
-    val isDirectDownloadable: Boolean = true
+    /** Whether this artifact has a public direct-download URL. */
+    val isDirectDownloadable: Boolean = true,
+    /** Whether a real local inference adapter is integrated for this artifact. */
+    val hasRuntimeIntegration: Boolean = true
 ) {
-    WHISPER_HINDI_MEDIUM_Q4(
-        displayName = "Hindi Speech Model",
+    WHISPER_MEDIUM_Q5_0(
+        displayName = "Multilingual Whisper Medium (Hindi capable)",
+        // Preserve the app-private cache name used by earlier releases.
         fileName = "whisper_hindi_medium_q4.bin",
-        // ggml-org/whisper-medium Q4_0 — publicly accessible without a login token
-        downloadUrl = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium-q5_0.bin",
-        sha256 = "REPLACE_WITH_ACTUAL_SHA256",
-        sizeBytes = 515_000_000L
+        // Exact upstream Q5_0 artifact, pinned to the commit containing its verified hash.
+        downloadUrl = "https://huggingface.co/ggerganov/whisper.cpp/resolve/f281eb45af861ab5e5297d23694b7d46e090c02c/ggml-medium-q5_0.bin",
+        sha256 = "19fea4b380c3a618ec4723c3eef2eb785ffba0d0538cf43f8f235e7b3b34220f",
+        sizeBytes = 539_212_467L
     ),
-    WHISPER_LARGE_V3_TURBO_Q4(
-        displayName = "English Speech Model",
+    WHISPER_LARGE_V3_TURBO_Q5_0(
+        displayName = "Whisper Large v3 Turbo",
+        // Preserve the app-private cache name used by earlier releases.
         fileName = "whisper_large_v3_turbo_q4.bin",
-        // ggml-org/whisper-large-v3-turbo Q4_0 — public release, no token required
-        downloadUrl = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin",
-        sha256 = "REPLACE_WITH_ACTUAL_SHA256",
-        sizeBytes = 834_000_000L
+        // Exact upstream Q5_0 artifact, pinned to the commit containing its verified hash.
+        downloadUrl = "https://huggingface.co/ggerganov/whisper.cpp/resolve/98aa99a0a9db05ae2342309f5096248665f7cba3/ggml-large-v3-turbo-q5_0.bin",
+        sha256 = "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2",
+        sizeBytes = 574_041_195L
     ),
-    WHISPER_SMALL_Q4(
-        displayName = "Speech Model (Compact)",
+    WHISPER_SMALL_Q5_1(
+        displayName = "Whisper Small",
+        // Preserve the app-private cache name used by earlier releases.
         fileName = "whisper_small_q4.bin",
-        // ggml-org/whisper-small Q4_0 — public
-        downloadUrl = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small-q5_1.bin",
-        sha256 = "REPLACE_WITH_ACTUAL_SHA256",
-        sizeBytes = 190_000_000L
+        // Exact upstream Q5_1 artifact, pinned to the commit containing its verified hash.
+        downloadUrl = "https://huggingface.co/ggerganov/whisper.cpp/resolve/f281eb45af861ab5e5297d23694b7d46e090c02c/ggml-small-q5_1.bin",
+        sha256 = "ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb",
+        sizeBytes = 190_085_487L
     ),
     QWEN3_VL_4B_QAIRT(
-        displayName = "Vision AI Model",
+        displayName = "Vision AI Model (Qualcomm SDK)",
         fileName = "qwen3_vl_4b_instruct_qairt.zip",
-        // Qualcomm AI Hub SDK model — NOT downloadable via HTTP.
-        // Marked isDirectDownloadable=false → excluded from download loop.
-        // App uses Groq cloud vision inference instead.
+        // Qualcomm AI Hub SDK model — not directly downloadable through this manager.
         downloadUrl = "https://aihub.qualcomm.com/models/qwen3_vl_4b_instruct",
-        sha256 = "REPLACE_WITH_ACTUAL_SHA256",
+        sha256 = "",
         sizeBytes = 2_700_000_000L,
-        isDirectDownloadable = false
+        isDirectDownloadable = false,
+        hasRuntimeIntegration = false
     ),
-    MOONDREAM2_Q4(
-        displayName = "Screen Reading Model",
+    MOONDREAM2_Q4_K(
+        displayName = "Moondream2 Screen Reader (Q4_K)",
         fileName = "moondream2_q4.gguf",
-        // vikhyatk/moondream2 public GGUF — no auth required
-        downloadUrl = "https://huggingface.co/salivosa/moondream2-gguf/resolve/main/moondream2-q4_k.gguf",
-        sha256 = "REPLACE_WITH_ACTUAL_SHA256",
-        sizeBytes = 735_000_000L
+        // Exact public Q4_K artifact, pinned to the commit containing its verified hash.
+        downloadUrl = "https://huggingface.co/salivosa/moondream2-gguf/resolve/205f2e67003198c7bdc7a93f5674dc3069b24513/moondream2-q4_k.gguf",
+        sha256 = "77baaa54e41cbfc24e305ee15f58ff2aca198517f658368f1be072d07b51f99d",
+        sizeBytes = 919_494_048L,
+        hasRuntimeIntegration = false
     ),
-    QWEN3_1_7B_Q4(
-        displayName = "Memory AI Model",
+    QWEN3_1_7B_Q4_K_M(
+        displayName = "Qwen3 1.7B Memory Model (Q4_K_M)",
+        // Preserve the old app-private cache path; old Qwen2.5 bytes will fail the new SHA-256.
         fileName = "qwen2_5_1_5b_q4.gguf",
-        // Qwen2.5-1.5B-Instruct Q4_K_M — confirmed public on HuggingFace, no token required
-        downloadUrl = "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf",
-        sha256 = "REPLACE_WITH_ACTUAL_SHA256",
-        sizeBytes = 1_117_320_736L
+        // Qwen3 1.7B Q4_K_M artifact, pinned to the exact Hugging Face file revision.
+        downloadUrl = "https://huggingface.co/unsloth/Qwen3-1.7B-GGUF/resolve/bd59ef4c1c7af8b7ade0d473f3ab0d48b9f1d338/Qwen3-1.7B-Q4_K_M.gguf",
+        sha256 = "b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897",
+        sizeBytes = 1_107_409_472L,
+        hasRuntimeIntegration = false
     );
 
+    val hasTrustedSha256: Boolean
+        get() = ModelIntegrity.isValidSha256(sha256)
+
     val subDir: String get() = when (this) {
-        WHISPER_HINDI_MEDIUM_Q4, WHISPER_LARGE_V3_TURBO_Q4, WHISPER_SMALL_Q4 -> "asr"
-        QWEN3_VL_4B_QAIRT, MOONDREAM2_Q4 -> "vlm"
-        QWEN3_1_7B_Q4 -> "llm"
+        WHISPER_MEDIUM_Q5_0, WHISPER_LARGE_V3_TURBO_Q5_0, WHISPER_SMALL_Q5_1 -> "asr"
+        QWEN3_VL_4B_QAIRT, MOONDREAM2_Q4_K -> "vlm"
+        QWEN3_1_7B_Q4_K_M -> "llm"
     }
 }

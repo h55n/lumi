@@ -87,16 +87,9 @@ object WhisperJNI {
      */
     @JvmStatic external fun detectLanguage(ctxPtr: Long, samples: FloatArray): String
 
-    // ── Mock implementations for when native lib is not available ──────────────
-
-    fun transcribeMock(samples: FloatArray, language: String): TranscriptResult {
-        // Return empty result when native engine is unavailable (cloud or system ASR handles it)
-        return TranscriptResult(
-            text = "",
-            languageCode = language,
-            confidence = 0.0f
-        )
-    }
+    /** Empty local result tells the router to try its configured cloud ASR fallback. */
+    fun unavailableTranscript(language: String): TranscriptResult =
+        TranscriptResult(text = "", languageCode = language, confidence = 0.0f)
 }
 
 data class TranscriptResult(

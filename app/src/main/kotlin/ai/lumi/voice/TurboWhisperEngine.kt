@@ -1,58 +1,58 @@
 package ai.lumi.voice
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import ai.lumi.inference.ModelDownloadManager
 import ai.lumi.inference.ModelSpec
 import org.json.JSONObject
-import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Whisper Large v3 Turbo Q4 GGUF.
+ * Local Whisper ASR. Prefers the Large v3 Turbo Q5_0 artifact and falls back
+ * to Whisper Small Q5_1 when that is the verified artifact selected for a budget device.
  *
  * Responsibilities:
  *  1. Language detection from first 3s of audio (via [detectLanguage])
  *  2. Full English transcription (when language == "en")
  *
- * Runtime:
- *  - FLAGSHIP: GenieX llama_cpp (Hexagon NPU via GGML backend)
- *  - MID_HIGH: whisper.cpp with Vulkan (Adreno GPU)
- *  - BUDGET: Replaced by WhisperSmall; this class still exists but is not instantiated
+ * Runtime: whisper.cpp JNI for the selected local model. Budget devices use
+ * Whisper Small through the model selector instead of loading this large model.
  */
 @Singleton
 class TurboWhisperEngine @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val modelDownloadManager: ModelDownloadManager
 ) {
 
     private var ctxPtr: Long = 0L
     private val isNativeAvailable get() = WhisperJNI.loadLibrary()
 
-    private val modelFile: File
-        get() = modelDownloadManager.modelFile(ModelSpec.WHISPER_LARGE_V3_TURBO_Q4)
-
     suspend fun warmUp() = withContext(Dispatchers.IO) {
         if (ctxPtr != 0L) return@withContext
         if (!isNativeAvailable) {
-            Timber.w("whisper.cpp JNI not available — using mock")
+            Timber.w("whisper.cpp JNI unavailable — local Turbo ASR disabled")
             return@withContext
         }
-        if (!modelFile.exists()) {
-            Timber.w("Whisper Turbo model not downloaded")
+        val model = listOf(
+            ModelSpec.WHISPER_LARGE_V3_TURBO_Q5_0,
+            ModelSpec.WHISPER_SMALL_Q5_1
+        ).firstOrNull { modelDownloadManager.isDownloaded(it) }
+        if (model == null) {
+            Timber.w("No supported Whisper model is installed with valid integrity metadata")
             return@withContext
         }
-        ctxPtr = WhisperJNI.initContext(modelFile.absolutePath)
-        Timber.i("Whisper Turbo loaded, ctxPtr=$ctxPtr")
+        ctxPtr = WhisperJNI.initContext(modelDownloadManager.modelFile(model).absolutePath)
+        if (ctxPtr == 0L) {
+            Timber.e("Whisper runtime failed to initialize the verified ${model.displayName} model")
+            return@withContext
+        }
+        Timber.i("${model.displayName} loaded, ctxPtr=$ctxPtr")
     }
 
     suspend fun detectLanguage(samples: FloatArray): DetectedLanguage = withContext(Dispatchers.IO) {
         if (!isNativeAvailable || ctxPtr == 0L) {
-            return@withContext DetectedLanguage("en", 0.5f) // mock fallback
+            return@withContext DetectedLanguage("und", 0.0f)
         }
         try {
             val json = WhisperJNI.detectLanguage(ctxPtr, samples)
@@ -63,13 +63,13 @@ class TurboWhisperEngine @Inject constructor(
             )
         } catch (e: Exception) {
             Timber.e(e, "detectLanguage error")
-            DetectedLanguage("en", 0f)
+            DetectedLanguage("und", 0f)
         }
     }
 
     suspend fun transcribe(samples: FloatArray): TranscriptResult = withContext(Dispatchers.IO) {
         if (!isNativeAvailable || ctxPtr == 0L) {
-            return@withContext WhisperJNI.transcribeMock(samples, "en")
+            return@withContext WhisperJNI.unavailableTranscript("en")
         }
         try {
             val json = WhisperJNI.transcribeWithParams(

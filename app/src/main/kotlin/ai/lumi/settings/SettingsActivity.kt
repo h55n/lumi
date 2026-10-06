@@ -87,17 +87,29 @@ class SettingsViewModel @Inject constructor(
     val maskedSarvamKey3 = MutableStateFlow(SecureKeyStore.getMaskedSarvamKey3())
     val maskedElevenLabsKey = MutableStateFlow(SecureKeyStore.getMaskedElevenLabsKey())
 
-    val downloadableModels = ai.lumi.inference.ModelSpec.entries.filter { it.isDirectDownloadable }
+    val downloadableModels = ai.lumi.inference.ModelSpec.entries.filter {
+        it.isDirectDownloadable && it.hasTrustedSha256 && it.hasRuntimeIntegration
+    }
     
     private val _downloadStates = MutableStateFlow<Map<ai.lumi.inference.ModelSpec, ai.lumi.inference.DownloadState>>(
-        downloadableModels.associateWith { spec ->
-            if (modelDownloadManager.isDownloaded(spec)) 
-                ai.lumi.inference.DownloadState.Complete(spec, java.io.File("")) 
-            else 
-                ai.lumi.inference.DownloadState.Idle
-        }
+        downloadableModels.associateWith { ai.lumi.inference.DownloadState.Idle }
     )
     val downloadStates = _downloadStates.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            downloadableModels.forEach { spec ->
+                if (modelDownloadManager.isDownloaded(spec)) {
+                    _downloadStates.update {
+                        it + (spec to ai.lumi.inference.DownloadState.Complete(
+                            spec,
+                            modelDownloadManager.modelFile(spec)
+                        ))
+                    }
+                }
+            }
+        }
+    }
 
     fun downloadModel(spec: ai.lumi.inference.ModelSpec) {
         viewModelScope.launch {

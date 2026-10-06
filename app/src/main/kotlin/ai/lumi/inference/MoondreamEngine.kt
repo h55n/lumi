@@ -35,12 +35,16 @@ class MoondreamEngine @Inject constructor(
     private var session: GenieXVLMSession? = null
 
     private val modelFile: File
-        get() = modelDownloadManager.modelFile(ModelSpec.MOONDREAM2_Q4)
+        get() = modelDownloadManager.modelFile(ModelSpec.MOONDREAM2_Q4_K)
 
     suspend fun warmUp(tier: DeviceTier) = withContext(Dispatchers.IO) {
         if (session != null) return@withContext
-        if (!modelFile.exists()) {
-            Timber.w("Moondream2 not downloaded — skipping warmup")
+        if (!ModelSpec.MOONDREAM2_Q4_K.hasRuntimeIntegration) {
+            Timber.w("Moondream local runtime is not integrated — skipping warmup")
+            return@withContext
+        }
+        if (!modelDownloadManager.isDownloaded(ModelSpec.MOONDREAM2_Q4_K)) {
+            Timber.w("Moondream2 is missing or failed integrity verification — skipping warmup")
             return@withContext
         }
         Timber.d("Warming up Moondream2 (tier=$tier)...")
