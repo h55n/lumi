@@ -19,7 +19,7 @@ concurrency:
 jobs:
   unit-tests:
     name: Gradle unit tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
