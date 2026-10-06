@@ -47,7 +47,10 @@ class VLMEngine @Inject constructor(
             return@withContext
         }
         Timber.d("Warming up Qwen3-VL-4B...")
-        session = GenieXRuntimeFactory.createVLMSession(DeviceTier.FLAGSHIP, modelFile)
+        session = GenieXRuntimeFactory.createVLMSession(DeviceTier.FLAGSHIP, modelFile) ?: run {
+            Timber.w("GenieX runtime is unavailable; local VLM guidance is disabled")
+            return@withContext
+        }
         Timber.i("Qwen3-VL-4B warm and ready")
     }
 
