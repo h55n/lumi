@@ -31,7 +31,10 @@ class TextLLMEngine @Inject constructor(
             return@withContext
         }
         Timber.d("Warming up Qwen3-1.7B...")
-        session = GenieXRuntimeFactory.createTextSession(DeviceTier.FLAGSHIP, modelFile)
+        session = GenieXRuntimeFactory.createTextSession(DeviceTier.FLAGSHIP, modelFile) ?: run {
+            Timber.w("GenieX text runtime is unavailable; memory extraction is disabled")
+            return@withContext
+        }
         Timber.i("Qwen3-1.7B warm and ready")
     }
 

@@ -82,10 +82,8 @@ cp libllama.so /path/to/lumi-android/app/src/main/jniLibs/arm64-v8a/
 
 ## Without native libs (CI / dev machine)
 
-The app will run in mock mode:
-- Whisper → returns hardcoded transcript "Send 500 rupees on PhonePe"
-- GenieX → returns canned JSON inference result
-- TTS → Android System TTS only
+- Whisper's native path is unavailable; its fallback returns an empty transcript, after which a configured cloud ASR path may be attempted.
+- GenieX VLM and text inference remain unavailable until real native adapters are integrated. The app does not substitute canned targets or memory facts.
+- TTS falls back to Android System TTS.
 
-This is sufficient for UI development and unit testing.
-All mock paths are in `WhisperJNI.transcribeMock()` and `MockQairtRuntime`.
+The app can be built and its non-inference logic tested without native libraries, but model-dependent behavior requires a real runtime and model files.

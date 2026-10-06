@@ -24,7 +24,7 @@ import javax.inject.Singleton
  * INTEGRATION:
  *  - FLAGSHIP / MID_HIGH: GenieX llama_cpp (Hexagon NPU via GGML backend)
  *  - BUDGET: llama.cpp with Vulkan (Adreno GPU)
- *  - Replace [MockQairtRuntime] with real session once native libs are compiled.
+ *  - Implement the GenieX adapter before enabling local Moondream inference.
  */
 @Singleton
 class MoondreamEngine @Inject constructor(
@@ -44,7 +44,10 @@ class MoondreamEngine @Inject constructor(
             return@withContext
         }
         Timber.d("Warming up Moondream2 (tier=$tier)...")
-        session = GenieXRuntimeFactory.createVLMSession(tier, modelFile)
+        session = GenieXRuntimeFactory.createVLMSession(tier, modelFile) ?: run {
+            Timber.w("GenieX runtime is unavailable; Moondream guidance is disabled")
+            return@withContext
+        }
         Timber.i("Moondream2 warm and ready")
     }
 
