@@ -101,7 +101,7 @@ class TaskEngine @Inject constructor(
                 engineScope.launch { onTranscriptReceived(text, lang) }
             } else if (intent.action == "ai.lumi.VOICE_ERROR") {
                 val error = intent.getStringExtra("error") ?: "Error"
-                Timber.e("VoiceService error: $error")
+                Timber.e("VoiceService reported a recognition error")
                 _state.value = TaskState.Idle
                 VoiceService.stopListening(context)
                 engineScope.launch { ttsEngine.speak(error, currentLanguage) }
@@ -249,7 +249,7 @@ class TaskEngine @Inject constructor(
                     goalPackageName != null &&
                     goalPackageName != tappedPackage
                 ) {
-                    Timber.d("onUserInteraction: ignoring launcher/search tap in $tappedPackage (goal=$goalPackageName)")
+                    Timber.d("onUserInteraction: ignoring launcher/search interaction outside target app")
                     return
                 }
                 val isLauncherOrSysUi = tappedPackage == "com.android.launcher3" ||
@@ -383,7 +383,7 @@ class TaskEngine @Inject constructor(
         repeatedGuidanceKey = null
         stepHistory.clear()
 
-        Timber.i("Goal: '$text' [$currentLanguage]")
+        Timber.i("Goal received for guidance [language=$currentLanguage]")
         _state.value = TaskState.Thinking(text, currentLanguage)
 
         val taskType = taskClassifier.classifyWithConfidence(text).type
@@ -755,7 +755,7 @@ class TaskEngine @Inject constructor(
     }
 
     private suspend fun onTaskComplete() {
-        Timber.i("onTaskComplete: goal='$currentGoal'")
+        Timber.i("Task completed")
         _state.value = TaskState.Done(currentLanguage)
         val msg = localizedCompletion(currentLanguage)
         ttsEngine.speak(msg, currentLanguage)

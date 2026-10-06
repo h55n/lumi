@@ -105,7 +105,7 @@ class AnthropicClient @Inject constructor(
                     Timber.i("CloudVLM: $name ✓")
                     return@withContext extractAndParseResponse(body, language, type)
                 }
-                Timber.w("CloudVLM: $name failed HTTP ${resp.code} — ${body.take(120)}")
+                Timber.w("CloudVLM: $name failed HTTP ${resp.code}")
                 // Rate limit (429) or server error (5xx) → try next provider
             } catch (e: Exception) {
                 Timber.w(e, "CloudVLM: $name threw — trying next")

@@ -1,5 +1,7 @@
 package ai.lumi.memory
 
+import androidx.room.withTransaction
+import ai.lumi.data.db.LumiDatabase
 import ai.lumi.data.db.dao.FormMemoryDao
 import ai.lumi.data.db.dao.MemoryVectorDao
 import ai.lumi.data.db.dao.TaskMemoryDao
@@ -11,6 +13,8 @@ import ai.lumi.data.db.entity.UserProfileEntity
 import ai.lumi.inference.MemoryFact
 import ai.lumi.inference.TextLLMEngine
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,7 +38,7 @@ class ProfileManager @Inject constructor(
 
     suspend fun setName(name: String) {
         userProfileDao.upsert(UserProfileEntity(KEY_NAME, name, source = "explicit"))
-        Timber.d("Profile: name='$name'")
+        Timber.d("Profile: explicit name saved")
     }
 
     suspend fun setLanguage(lang: String) {
@@ -52,7 +56,7 @@ class ProfileManager @Inject constructor(
             return
         }
         userProfileDao.upsert(UserProfileEntity(key, value, confidence, source))
-        Timber.d("Profile upsert: $key='$value' (conf=$confidence, src=$source)")
+        Timber.d("Profile fact saved (confidence=$confidence, source=$source)")
     }
 
     suspend fun applyFacts(facts: List<MemoryFact>) {
@@ -90,7 +94,7 @@ class FormMemoryManager @Inject constructor(
         } else {
             formMemoryDao.upsert(existing.copy(value = value, lastUsedAt = System.currentTimeMillis()))
         }
-        Timber.d("FormMemory: $fieldType='$value'")
+        Timber.d("Form memory value saved")
     }
 
     /** Field types Lumi recognises for auto-fill. */
@@ -115,14 +119,25 @@ class MemoryRepository @Inject constructor(
     private val profileManager: ProfileManager,
     private val formMemoryManager: FormMemoryManager,
     private val taskMemoryDao: TaskMemoryDao,
-    private val textLLMEngine: TextLLMEngine
+    private val textLLMEngine: TextLLMEngine,
+    private val database: LumiDatabase
 ) {
+    private val mutationMutex = Mutex()
+    private var memoryGeneration = 0L
+
     /** Extract and persist memories from a completed task transcript. Flagship only. */
     suspend fun extractAndStore(taskTranscript: String) {
+        val requestGeneration = mutationMutex.withLock { memoryGeneration }
         val facts = textLLMEngine.extractMemories(taskTranscript)
         if (facts.isEmpty()) return
-        profileManager.applyFacts(facts)
-        Timber.i("MemoryRepository: extracted ${facts.size} facts from transcript")
+        var stored = false
+        mutationMutex.withLock {
+            if (requestGeneration == memoryGeneration) {
+                database.withTransaction { profileManager.applyFacts(facts) }
+                stored = true
+            }
+        }
+        if (stored) Timber.i("MemoryRepository: stored ${facts.size} extracted facts")
     }
 
     suspend fun recordTaskCompletion(
@@ -132,19 +147,37 @@ class MemoryRepository @Inject constructor(
         success: Boolean,
         correctedStep: Int? = null
     ) {
-        taskMemoryDao.insert(
-            TaskMemoryEntity(
-                taskType = taskType,
-                taskParamsJson = params,
-                stepCount = steps,
-                userCorrectedStep = correctedStep,
-                completedSuccessfully = success
+        mutationMutex.withLock {
+            taskMemoryDao.insert(
+                TaskMemoryEntity(
+                    taskType = taskType,
+                    taskParamsJson = params,
+                    stepCount = steps,
+                    userCorrectedStep = correctedStep,
+                    completedSuccessfully = success
+                )
             )
-        )
+        }
+    }
+
+    suspend fun clearAll() {
+        mutationMutex.withLock {
+            memoryGeneration++
+            database.clearAllMemoryData()
+        }
     }
 
     suspend fun getSuccessCount(taskType: String): Int =
         taskMemoryDao.successfulCompletionCount(taskType)
+}
+
+internal suspend fun LumiDatabase.clearAllMemoryData() {
+    withTransaction {
+        userProfileDao().clearAll()
+        formMemoryDao().clearAll()
+        taskMemoryDao().clearAll()
+        memoryVectorDao().clearAll()
+    }
 }
 
 // ── VectorSearchEngine ─────────────────────────────────────────────────────────
