@@ -483,7 +483,7 @@ object SecureKeyStore {
     private var prefs: android.content.SharedPreferences? = null
 
     fun init(context: android.content.Context) {
-        prefs = try {
+        init(context) {
             androidx.security.crypto.EncryptedSharedPreferences.create(
                 context, PREF_FILE,
                 androidx.security.crypto.MasterKey.Builder(context)
@@ -492,9 +492,21 @@ object SecureKeyStore {
                 androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
-        } catch (e: Exception) {
-            // Fallback to plain prefs if keystore unavailable (emulators, rooted devices)
-            context.getSharedPreferences(PREF_FILE, android.content.Context.MODE_PRIVATE)
+        }
+    }
+
+    internal fun init(
+        context: android.content.Context,
+        encryptedPrefsFactory: () -> android.content.SharedPreferences
+    ) {
+        prefs = null
+        prefs = try {
+            encryptedPrefsFactory()
+        } catch (_: Exception) {
+            // Do not persist provider credentials in plaintext when the Keystore is unavailable.
+            runCatching { context.deleteSharedPreferences(PREF_FILE) }
+            Timber.e("Secure credential storage unavailable; provider keys are disabled")
+            null
         }
     }
 
@@ -522,11 +534,7 @@ object SecureKeyStore {
     }
     fun getSarvamKey(slot: Int = 1): String? {
         val k = when (slot) { 2 -> KEY_SARVAM_TTS_2; 3 -> KEY_SARVAM_TTS_3; else -> KEY_SARVAM_TTS }
-        val saved = prefs?.getString(k, null)?.takeIf { it.isNotBlank() }
-        if (slot == 1 && saved == null) {
-            return "sk_ut8urnl8_tQSURrC7ySqicbv9DVnb4vM7" // Generated default key
-        }
-        return saved
+        return prefs?.getString(k, null)?.takeIf { it.isNotBlank() }
     }
     /** Returns all configured Sarvam keys in priority order (non-null, non-blank). */
     fun getSarvamKeys(): List<String> = listOfNotNull(
