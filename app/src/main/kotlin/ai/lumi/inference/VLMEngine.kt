@@ -76,7 +76,7 @@ class VLMEngine @Inject constructor(
         val systemPrompt = buildSystemPrompt(language)
         val userPrompt = buildUserPrompt(taskGoal, stepHistory, language)
 
-        Timber.d("VLMEngine.analyse: goal='$taskGoal' lang=$language")
+        Timber.d("VLMEngine.analyse: request [language=$language]")
 
         try {
             val rawJson = s.infer(screenshot, userPrompt, systemPrompt)
@@ -147,7 +147,7 @@ If the task is complete, respond:
                 )
             }
         } catch (e: Exception) {
-            Timber.e(e, "Failed to parse VLM output: $rawJson")
+            Timber.e(e, "Failed to parse VLM output")
             InferenceResult.error("Parse error", language)
         }
     }

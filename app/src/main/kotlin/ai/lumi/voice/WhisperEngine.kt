@@ -82,7 +82,7 @@ class WhisperEngine @Inject constructor(
                 result = result.copy(languageCode = "hi")
             }
 
-            Timber.i("ASR final result: '${result.text}' [${result.languageCode}]")
+            Timber.i("ASR transcription completed [${result.languageCode}]")
             result
         }
 
@@ -179,11 +179,13 @@ class WhisperEngine @Inject constructor(
                     else -> rawLang
                 }
                 if (text.isNotBlank()) {
-                    Timber.i("Groq Whisper STT succeeded: '$text' [$lang]")
+                    Timber.i("Groq Whisper STT succeeded [$lang]")
                     return TranscriptResult(text, lang, 0.98f)
                 }
             } else {
-                Timber.w("Groq Whisper HTTP error: ${response.code} — ${response.body?.string()}")
+                val errorCode = response.code
+                response.close()
+                Timber.w("Groq Whisper HTTP error: $errorCode")
             }
         } catch (e: Exception) {
             Timber.e(e, "Error calling Groq Whisper STT")

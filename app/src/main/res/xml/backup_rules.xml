@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    No cloud backup — all data stays on device.
-    Room DB encrypted with Android Keystore-backed key.
-    API keys in EncryptedSharedPreferences — never backed up.
+    App backup is disabled by android:allowBackup="false" in the manifest.
+    The Room database is not encrypted; keep it explicitly excluded as defense in depth.
+    API-key preferences and downloaded model files are excluded as well.
 -->
 <full-backup-content>
     <exclude domain="database" path="lumi.db" />

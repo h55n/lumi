@@ -26,7 +26,7 @@ object AppModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): LumiDatabase =
         Room.databaseBuilder(context, LumiDatabase::class.java, "lumi.db")
-            .fallbackToDestructiveMigration()
+            // Add explicit Room migrations for future schema versions; never silently wipe memory.
             .build()
 
     @Provides fun provideUIMapDao(db: LumiDatabase): UIMapDao = db.uiMapDao()

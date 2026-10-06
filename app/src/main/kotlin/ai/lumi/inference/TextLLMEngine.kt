@@ -75,7 +75,7 @@ $taskTranscript
                 )
             }.toList()
         } catch (e: Exception) {
-            Timber.e(e, "Failed to parse memory facts from: $raw")
+            Timber.e(e, "Failed to parse memory facts")
             emptyList()
         }
     }

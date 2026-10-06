@@ -28,10 +28,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ai.lumi.cloud.SecureKeyStore
 import ai.lumi.data.datastore.LumiPreferences
-import ai.lumi.data.db.dao.FormMemoryDao
 import ai.lumi.data.db.dao.UserProfileDao
 import ai.lumi.data.db.entity.FormMemoryEntity
 import ai.lumi.data.db.entity.UserProfileEntity
+import ai.lumi.memory.MemoryRepository
 import ai.lumi.ui.components.LumiButton
 import ai.lumi.ui.components.LumiCard
 import ai.lumi.ui.components.SUPPORTED_LANGUAGES
@@ -54,7 +54,7 @@ class SettingsActivity : ComponentActivity() {
 class SettingsViewModel @Inject constructor(
     private val preferences: LumiPreferences,
     private val userProfileDao: UserProfileDao,
-    private val formMemoryDao: FormMemoryDao,
+    private val memoryRepository: MemoryRepository,
     private val modelDownloadManager: ai.lumi.inference.ModelDownloadManager,
     private val modelSelector: ai.lumi.inference.ModelSelector,
     private val deviceScannerService: ai.lumi.engine.DeviceScannerService
@@ -172,8 +172,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun clearMemory() = viewModelScope.launch {
-        userProfileDao.clearAll()
-        formMemoryDao.clearAll()
+        memoryRepository.clearAll()
     }
 }
 
@@ -518,7 +517,9 @@ fun SettingsScreen(onBack: () -> Unit) {
         AlertDialog(
             onDismissRequest = { showClearDialog = false },
             title = { Text("Clear memories?") },
-            text = { Text("Lumi will forget your name, language preference, and saved form data. This cannot be undone.") },
+            text = {
+                Text("This deletes saved profile facts, form-memory values, task history, and memory vectors. Downloaded models and provider API keys are not deleted. This cannot be undone.")
+            },
             confirmButton = {
                 TextButton(onClick = { viewModel.clearMemory(); showClearDialog = false }) {
                     Text("Clear", color = Color(0xFFDC2626))

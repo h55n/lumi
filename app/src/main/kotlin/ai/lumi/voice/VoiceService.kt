@@ -260,7 +260,7 @@ class VoiceService : Service() {
                 recognizerRetryCount = 0
                 val matches = results?.getStringArrayList(android.speech.SpeechRecognizer.RESULTS_RECOGNITION)
                 val text = matches?.firstOrNull()?.trim() ?: ""
-                Timber.i("SpeechRecognizer transcription: '$text' (candidates: ${matches?.take(3)})")
+                Timber.i("SpeechRecognizer returned a result")
                 if (text.isNotBlank()) {
                     val language = if (text.any { it in '\u0900'..'\u097F' }) "hi" else activeLanguage
                     broadcastTranscript(text, language)

@@ -33,7 +33,7 @@ class TTSEngine @Inject constructor(
         // If requested language is Hindi but text is all Latin/ASCII (model replied in English),
         // speak in English so it's intelligible. If text has Devanagari, speak in Hindi.
         val effectiveLang = resolveEffectiveLanguage(text, language)
-        Timber.d("TTSEngine.speak: '$text' [requested=$language, effective=$effectiveLang]")
+        Timber.d("TTSEngine.speak requested=$language, effective=$effectiveLang")
 
         val provider = SecureKeyStore.getActiveTtsProvider()
 
