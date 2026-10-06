@@ -61,8 +61,9 @@ object IntentLibrary {
         }
 
         // FLASHLIGHT
-        if (matchesAny(lower, listOf("torch", "flashlight", "torch on", "torch off", "torch chalu", "torch band"))) {
-            return SystemIntentMatch(SystemIntent.FLASHLIGHT, null, 0.95f)
+        val flashlightState = extractFlashlightState(lower)
+        if (flashlightState != null) {
+            return SystemIntentMatch(SystemIntent.FLASHLIGHT, flashlightState, 0.95f)
         }
 
         // ALARM
@@ -72,7 +73,7 @@ object IntentLibrary {
 
         // TIMER
         if (matchesAny(lower, listOf("timer lagao", "timer set karo", "timer set", "start timer"))) {
-            val duration = extractNumber(lower)
+            val duration = extractDurationSeconds(lower)
             return SystemIntentMatch(SystemIntent.TIMER, duration, 0.9f)
         }
 
@@ -127,11 +128,15 @@ object IntentLibrary {
                     speak(ttsEngine, "Opening battery settings", language)
                 }
                 SystemIntent.FLASHLIGHT -> {
+                    val enabled = flashlightEnabled(match) ?: run {
+                        Timber.w("Flashlight action rejected: explicit on/off state missing")
+                        return
+                    }
                     try {
                         val cm = context.getSystemService(Context.CAMERA_SERVICE) as android.hardware.camera2.CameraManager
                         val camId = cm.cameraIdList.firstOrNull() ?: return
-                        cm.setTorchMode(camId, true)
-                        speak(ttsEngine, "Flashlight on", language)
+                        cm.setTorchMode(camId, enabled)
+                        speak(ttsEngine, if (enabled) "Flashlight on" else "Flashlight off", language)
                     } catch (e: Exception) { Timber.e(e, "Flashlight toggle failed") }
                 }
                 SystemIntent.ALARM -> {
@@ -141,14 +146,9 @@ object IntentLibrary {
                     speak(ttsEngine, "Opening alarm", language)
                 }
                 SystemIntent.TIMER -> {
-                    val intent = Intent(AlarmClock.ACTION_SET_TIMER)
-                    match.extractedParam?.toIntOrNull()?.let { mins ->
-                        intent.putExtra(AlarmClock.EXTRA_LENGTH, mins * 60)
-                        intent.putExtra(AlarmClock.EXTRA_SKIP_UI, true)
-                    }
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(intent)
-                    speak(ttsEngine, "Timer set", language)
+                    val seconds = match.extractedParam?.toIntOrNull()
+                    context.startActivity(buildTimerIntent(seconds))
+                    speak(ttsEngine, if (language == "hi") "टाइमर की पुष्टि के लिए खोल रहा हूँ।" else "Opening timer for confirmation", language)
                 }
                 SystemIntent.CALCULATOR -> {
                     val intent = Intent().apply {
@@ -181,6 +181,22 @@ object IntentLibrary {
         } catch (e: Exception) { Timber.e(e, "Error executing system intent ${match.intent}") }
     }
 
+    internal fun buildTimerIntent(durationSeconds: Int?): Intent =
+        Intent(AlarmClock.ACTION_SET_TIMER).apply {
+            durationSeconds?.takeIf { it in 1..86_400 }?.let {
+                putExtra(AlarmClock.EXTRA_LENGTH, it)
+            }
+            putExtra(AlarmClock.EXTRA_SKIP_UI, false)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+    internal fun flashlightEnabled(match: SystemIntentMatch): Boolean? =
+        when (match.extractedParam) {
+            "on" -> true
+            "off" -> false
+            else -> null
+        }
+
     private fun matchesAny(utterance: String, keywords: List<String>): Boolean =
         keywords.any { utterance.contains(it) }
 
@@ -190,7 +206,36 @@ object IntentLibrary {
         return null
     }
 
-    private fun extractNumber(utterance: String): String? = Regex("""\d+""").find(utterance)?.value
+    private fun extractFlashlightState(utterance: String): String? {
+        if (!matchesAny(utterance, listOf("torch", "flashlight", "टॉर्च", "फ्लैशलाइट", "फ़्लैशलाइट"))) return null
+
+        val off = Regex("""\b(off|band|disable)\b""").containsMatchIn(utterance) ||
+            utterance.contains("बंद") || utterance.contains("बुझा")
+        val on = Regex("""\b(on|chalu|enable)\b""").containsMatchIn(utterance) ||
+            utterance.contains("चालू") || utterance.contains("जलाओ")
+
+        return when {
+            off && !on -> "off"
+            on && !off -> "on"
+            else -> null
+        }
+    }
+
+    private fun extractDurationSeconds(utterance: String): String? {
+        val english = Regex("""\b(\d{1,4})\s*(seconds?|secs?|sec|minutes?|mins?|min|hours?|hrs?|hr)\b""")
+            .find(utterance)
+        val hindi = Regex("""(\d{1,4})\s*(सेकंडों?|मिनटों?|घंटे?|घंटा)""").find(utterance)
+        val match = english ?: hindi ?: return null
+        val amount = match.groupValues[1].toIntOrNull() ?: return null
+        val unit = match.groupValues[2]
+        val multiplier = when {
+            unit.startsWith("hour") || unit.startsWith("hr") || unit.contains("घंट") -> 3_600
+            unit.startsWith("min") || unit.contains("मिनट") -> 60
+            else -> 1
+        }
+        val seconds = amount.toLong() * multiplier
+        return seconds.takeIf { it in 1L..86_400L }?.toString()
+    }
 
     private fun extractAppName(utterance: String): String? {
         val words = utterance.split(" ")
@@ -206,4 +251,3 @@ object IntentLibrary {
         CoroutineScope(Dispatchers.IO).launch { ttsEngine.speak(text, language) }
     }
 }
-
