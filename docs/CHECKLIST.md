@@ -72,47 +72,42 @@
 ---
 
 ## PHASE 2 — Model Downloads
-*Download all models before the hackathon. Venue WiFi is unreliable. ~1–3 hours.*
+*Direct artifacts now have pinned revisions, exact sizes, and SHA-256 verification. Downloads are staged and verified before install; explicit onboarding/Settings paths remain. Device-specific validation is still pending.*
 
-### Hindi ASR — vasista22/whisper-hindi-medium-Q4 (~424 MB)
-- [ ] Download from: `https://huggingface.co/vasista22/whisper-hindi-medium`
-- [ ] Filename: `ggml-model-q4_0.bin`
-- [ ] Saved to device path: `<app-files>/models/asr/whisper_hindi_medium_q4.bin`
-- [ ] File size: ~424 MB (verify — corrupt file = silent crash)
-- [ ] SHA-256 computed and updated in `ModelSpec.WHISPER_HINDI_MEDIUM_Q4.sha256`
+### Hindi-capable ASR — multilingual Whisper Medium Q5_0
+- [x] Pin `ggml-medium-q5_0.bin` metadata in `ModelSpec.WHISPER_MEDIUM_Q5_0` (539,212,467 bytes)
+- [x] Verify model size and SHA-256 before loading; this is not a Hindi-specific fine-tune
+- [ ] Download and test non-empty Hindi transcription on the target device
+- [ ] Verify the Hindi route selects this multilingual model rather than claiming a specialized checkpoint
 
-### English ASR — Whisper Large v3 Turbo Q4 (~800 MB)
-- [ ] Download from: `https://huggingface.co/ggerganov/whisper.cpp`
-- [ ] Filename: `ggml-large-v3-turbo-q4_0.bin`
-- [ ] Saved to device: `<app-files>/models/asr/whisper_large_v3_turbo_q4.gguf`
-- [ ] File size: ~800 MB
-- [ ] SHA-256 computed and updated in `ModelSpec.WHISPER_LARGE_V3_TURBO_Q4.sha256`
+### English ASR — Whisper Large v3 Turbo Q5_0
+- [x] Pin `ggml-large-v3-turbo-q5_0.bin` metadata in `ModelSpec.WHISPER_LARGE_V3_TURBO_Q5_0` (574,041,195 bytes)
+- [x] Verify model size and SHA-256 before loading
+- [ ] Download and test language detection/transcription on the target device
 
-### Fast-path VLM — Moondream2 Q4 GGUF (~700 MB)
-- [ ] Download from: `https://huggingface.co/vikhyatk/moondream2`
-- [ ] Filename: `moondream2-int4.gguf`
-- [ ] Saved to device: `<app-files>/models/vlm/moondream2_q4.gguf`
-- [ ] SHA-256 updated in `ModelSpec.MOONDREAM2_Q4.sha256`
+### Compact ASR — Whisper Small Q5_1
+- [x] Pin `ggml-small-q5_1.bin` metadata in `ModelSpec.WHISPER_SMALL_Q5_1` (190,085,487 bytes)
+- [ ] Validate budget-tier installation and inference on the target device
 
-### Flagship VLM — Qwen3-VL-4B via Qualcomm AI Hub (~2.5 GB) *(flagship only)*
-- [ ] Create account at `https://aihub.qualcomm.com`
-- [ ] Find Qwen3-VL-4B-Instruct model page
-- [ ] Select compile target: `Snapdragon 8 Elite Gen 5 (SM8850-AC)`
-- [ ] Download compiled bundle (`.zip` or directory)
-- [ ] Saved to device: `<app-files>/models/vlm/qwen3_vl_4b_instruct_qairt/`
-- [ ] SHA-256 updated in `ModelSpec.QWEN3_VL_4B_QAIRT.sha256`
+### Fast-path VLM — Moondream2 Q4_K GGUF
+- [x] Pin `moondream2-q4_k.gguf` metadata in `ModelSpec.MOONDREAM2_Q4_K` (919,494,048 bytes)
+- [x] Keep the model blocked from onboarding, Settings, download, and sideload until a real GenieX adapter exists
+- [ ] Integrate and validate a real local VLM adapter before enabling this artifact
 
-### Memory LLM — Qwen3-1.7B Q4 (~1 GB) *(flagship only)*
-- [ ] Download from: `https://huggingface.co/Qwen/Qwen3-1.7B-GGUF`
-- [ ] Filename: `Qwen3-1.7B-Q4_K_M.gguf`
-- [ ] Saved to device: `<app-files>/models/llm/qwen3_1_7b_q4.gguf`
-- [ ] SHA-256 updated in `ModelSpec.QWEN3_1_7B_Q4.sha256`
+### Flagship VLM — Qwen3-VL-4B via Qualcomm AI Hub *(flagship only)*
+- [x] Fail closed: no direct download or runtime load; a trusted distribution digest and runtime adapter are absent
+- [ ] Obtain an official distribution and trusted digest, then integrate a real adapter before enabling it
+
+### Memory LLM — Qwen3-1.7B Q4_K_M *(flagship only)*
+- [x] Pin `Qwen3-1.7B-Q4_K_M.gguf` metadata in `ModelSpec.QWEN3_1_7B_Q4_K_M` (1,107,409,472 bytes)
+- [x] Keep the model blocked from onboarding, Settings, download, and sideload because a real text adapter is not integrated; the prior Qwen2.5 cache is not reusable
+- [ ] Integrate and validate a real local text-generation adapter before enabling this artifact
 
 ### USB Backup (CRITICAL for hackathon)
-- [ ] All model files copied to USB-C drive
-- [ ] USB-C drive labelled clearly and packed in bag
-- [ ] `ModelDownloadManager.sideloadFromPath()` tested with USB path
-- [ ] File-picker fallback flow tested end-to-end on iQOO 15
+- [x] Unit tests cover strict hash/size validation and preservation of the previous model after a failed staged install
+- [ ] Copy verified model files to a USB-C drive
+- [ ] Test `ModelDownloadManager.sideloadFromPath()` with a verified model on-device
+- [ ] Test file-picker fallback end-to-end on iQOO 15
 
 ---
 

@@ -22,12 +22,16 @@ class TextLLMEngine @Inject constructor(
     private var session: GenieXTextSession? = null
 
     private val modelFile: File
-        get() = modelDownloadManager.modelFile(ModelSpec.QWEN3_1_7B_Q4)
+        get() = modelDownloadManager.modelFile(ModelSpec.QWEN3_1_7B_Q4_K_M)
 
     suspend fun warmUp() = withContext(Dispatchers.IO) {
         if (session != null) return@withContext
-        if (!modelFile.exists()) {
-            Timber.w("Qwen3-1.7B not downloaded — memory extraction disabled")
+        if (!ModelSpec.QWEN3_1_7B_Q4_K_M.hasRuntimeIntegration) {
+            Timber.w("Qwen3 text runtime is not integrated — memory extraction disabled")
+            return@withContext
+        }
+        if (!modelDownloadManager.isDownloaded(ModelSpec.QWEN3_1_7B_Q4_K_M)) {
+            Timber.w("Qwen3-1.7B is missing or failed integrity verification — memory extraction disabled")
             return@withContext
         }
         Timber.d("Warming up Qwen3-1.7B...")

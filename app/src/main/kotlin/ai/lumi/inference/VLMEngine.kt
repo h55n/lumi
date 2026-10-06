@@ -42,8 +42,12 @@ class VLMEngine @Inject constructor(
      */
     suspend fun warmUp() = withContext(Dispatchers.IO) {
         if (session != null) return@withContext
-        if (!modelFile.exists()) {
-            Timber.w("Qwen3-VL-4B not downloaded — skipping warmup")
+        if (!ModelSpec.QWEN3_VL_4B_QAIRT.hasRuntimeIntegration) {
+            Timber.w("Qwen3-VL Qualcomm runtime is not integrated — skipping warmup")
+            return@withContext
+        }
+        if (!modelDownloadManager.isDownloaded(ModelSpec.QWEN3_VL_4B_QAIRT)) {
+            Timber.w("Qwen3-VL-4B is unavailable or lacks trusted integrity metadata — skipping warmup")
             return@withContext
         }
         Timber.d("Warming up Qwen3-VL-4B...")

@@ -7,13 +7,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Orchestrates the two-stage ASR pipeline:
- * 1. Language detection (Whisper Turbo, 3s clip)
- * 2. Full transcription via language-specific model
+ * Orchestrates the ASR pipeline:
+ * 1. Language detection from a short audio clip
+ * 2. Local transcription, with Groq Cloud Whisper as fallback when local ASR is unavailable
  *
  * Flow:
  *   audio → [TurboWhisperEngine.detectLanguage] → route to:
- *     "hi"  → [HindiWhisperEngine.transcribe]
+ *     "hi"  → [HindiWhisperEngine.transcribe] (multilingual Whisper Medium)
  *     "en"  → [TurboWhisperEngine.transcribe]
  *     else  → [TurboWhisperEngine.transcribe] (best-effort)
  */
@@ -35,7 +35,7 @@ class WhisperEngine @Inject constructor(
     /**
      * Detect language then transcribe [audioBuffer] (full recording).
      * Priority:
-     *  1. Local model (Hindi fine-tuned or Whisper Turbo)
+     *  1. Verified local Whisper model, when available
      *  2. Groq Whisper Cloud (whisper-large-v3, ~150ms latency)
      * Returns [TranscriptResult] with text + language code.
      */
@@ -49,7 +49,7 @@ class WhisperEngine @Inject constructor(
                 // language-specific model on Hinglish or mixed-language speech.
                 detected.confidence < 0.75f -> turboWhisperEngine.transcribe(audioBuffer)
                 detected.code == "hi" -> {
-                    Timber.d("Routing to Hindi fine-tuned model")
+                    Timber.d("Routing to multilingual Whisper Medium for Hindi")
                     hindiWhisperEngine.transcribe(audioBuffer)
                 }
                 else -> {
@@ -66,7 +66,7 @@ class WhisperEngine @Inject constructor(
                 if (turboResult.text.isNotBlank()) result = turboResult
             }
 
-            // If local model produced no text (not downloaded / mock), fall back to Groq Cloud Whisper
+            // If local ASR is unavailable or produces no text, try Groq Cloud Whisper.
             if (result.text.isBlank()) {
                 Timber.i("Local Whisper produced no text — trying Groq Cloud Whisper (whisper-large-v3)")
                 val cloudResult = transcribeWithGroq(audioBuffer, detected.code)

@@ -64,7 +64,6 @@ class TaskEngine @Inject constructor(
     private val modelSelector: ModelSelector,
     private val preferences: LumiPreferences,
     private val anthropicClient: AnthropicClient,
-    private val modelDownloadManager: ai.lumi.inference.ModelDownloadManager,
     private val actionTemplateEngine: ActionTemplateEngine,
     private val elementMatcher: ElementMatcher,
     private val tapEvaluator: TapEvaluator,
@@ -135,26 +134,6 @@ class TaskEngine @Inject constructor(
                 appInventory.restoreFromPreferences()
             } catch (e: Exception) {
                 Timber.w(e, "AppInventory restore failed")
-            }
-        }
-
-        engineScope.launch {
-            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
-            val network = cm.activeNetwork
-            val caps = network?.let { cm.getNetworkCapabilities(it) }
-            val isWifi = caps?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) == true
-            
-            if (isWifi) {
-                ai.lumi.inference.ModelSpec.entries.filter { it.isDirectDownloadable }.forEach { spec ->
-                    if (!modelDownloadManager.isDownloaded(spec)) {
-                        Timber.i("Auto-downloading missing model: ${spec.displayName}")
-                        try {
-                            modelDownloadManager.download(spec, allowCellular = false).collect {}
-                        } catch (e: Exception) {
-                            Timber.e(e, "Auto-download failed for ${spec.displayName}")
-                        }
-                    }
-                }
             }
         }
     }
